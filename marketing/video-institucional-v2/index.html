@@ -1,0 +1,417 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<style>
+@font-face { font-family: Poppins; font-weight: 400; src: url(Poppins-400.ttf); }
+@font-face { font-family: Poppins; font-weight: 600; src: url(Poppins-600.ttf); }
+@font-face { font-family: Poppins; font-weight: 700; src: url(Poppins-700.ttf); }
+@font-face { font-family: 'DM Serif Display'; font-weight: 400; src: url(DMSerifDisplay-400.ttf); }
+
+/* Themes — see /Motion.md */
+body.pastel {
+  --bg: #F8F6F2; --fg: #111111; --soft: #555555; --muted: #8A8A8A; --line: #E2DDD8; --card: #FFFFFF;
+  --accent: #EDD9D2; --accent-fg: #111111; --mapline: #C8C3BC;
+  --display: 'DM Serif Display', serif; --display-w: 400; --display-ls: -0.02em; --em-style: italic; --em-color: #555;
+}
+body.orange {
+  --bg: #0B0B0D; --fg: #FFFFFF; --soft: #C2C2C7; --muted: #85858B; --line: #2A2A30; --card: #17171B;
+  --accent: #F47B20; --accent-fg: #0B0B0D; --mapline: #3A3A42;
+  --display: Poppins, sans-serif; --display-w: 700; --display-ls: -0.045em; --em-style: normal; --em-color: #F47B20;
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+html, body { width: 1080px; height: 1920px; overflow: hidden; background: var(--bg); }
+#stage { position: relative; width: 1080px; height: 1920px; overflow: hidden; background: var(--bg); color: var(--fg);
+  font-family: Poppins, sans-serif; -webkit-font-smoothing: antialiased; }
+.scene { position: absolute; inset: 0; display: none; }
+.abs { position: absolute; }
+.d { font-family: var(--display); font-weight: var(--display-w); letter-spacing: var(--display-ls); line-height: 0.98; }
+.d em { font-style: var(--em-style); color: var(--em-color); }
+.t { font-weight: 600; letter-spacing: -0.02em; }
+.eyebrow { font-weight: 600; font-size: 30px; letter-spacing: 0.3em; text-transform: uppercase; color: var(--muted); }
+.ln { overflow: hidden; padding: 0.06em 0 0.12em; margin: -0.06em 0 -0.12em; }
+.ln > span { display: inline-block; will-change: transform; }
+.hl { position: relative; display: inline-block; z-index: 0; }
+.hl::before { content: ''; position: absolute; left: -0.1em; right: -0.1em; top: 0.1em; bottom: 0.02em; background: var(--accent); z-index: -1;
+  transform-origin: left; transform: scaleX(var(--hl, 0)); border-radius: 10px; }
+.pill { display: inline-flex; align-items: center; gap: 14px; padding: 18px 34px; border-radius: 100px; font-weight: 600; font-size: 40px; white-space: nowrap; }
+.pill.solid { background: var(--fg); color: var(--bg); }
+.pill.acc { background: var(--accent); color: var(--accent-fg); }
+
+#mark { left: 72px; top: 236px; width: 104px; }
+#wipe { position: absolute; left: 0; right: 0; height: 2200px; top: -140px; background: var(--accent); z-index: 50; transform: translateY(100%); }
+
+/* map */
+#map { left: 160px; top: 540px; width: 800px; height: 773px; overflow: visible; }
+#map path { stroke-width: 1.6; stroke-linejoin: round; }
+
+/* banks */
+.grid { display: grid; grid-template-columns: repeat(3, 284px); gap: 24px; }
+.bank { height: 170px; border-radius: 34px; background: #fff; border: 2px solid var(--line); display: flex; align-items: center; justify-content: center; overflow: hidden; }
+.bank img { max-width: 80%; max-height: 66%; object-fit: contain; }
+.bank.more { background: var(--fg); color: var(--bg); border: 0; font-family: var(--display); font-weight: var(--display-w); font-size: 72px; letter-spacing: var(--display-ls); }
+
+/* chat */
+.chat { overflow: hidden; -webkit-mask-image: linear-gradient(to bottom, transparent 0, #000 60px); left: 72px; width: 936px; top: 740px; height: 720px; display: flex; flex-direction: column; justify-content: flex-end; gap: 22px; }
+.msg { max-width: 82%; padding: 26px 34px; border-radius: 44px; font-size: 44px; line-height: 1.3; }
+.msg.me { align-self: flex-end; background: var(--fg); color: var(--bg); border-bottom-right-radius: 12px; }
+.msg.nix { align-self: flex-start; background: var(--card); border: 2px solid var(--line); border-bottom-left-radius: 12px; }
+.who { display: flex; align-items: center; gap: 14px; font-size: 28px; font-weight: 600; color: var(--muted); margin-bottom: 10px; }
+.av { width: 54px; height: 54px; border-radius: 50%; background: #111; display: flex; align-items: center; justify-content: center; }
+.av img { width: 36px; }
+.typing { display: flex; gap: 12px; padding: 34px 40px; }
+.typing b { width: 18px; height: 18px; border-radius: 50%; background: var(--muted); display: block; }
+.bar { height: 14px; border-radius: 10px; background: var(--line); margin-top: 16px; overflow: hidden; }
+.bar i { display: block; height: 100%; background: var(--fg); }
+.offer { display: flex; justify-content: space-between; align-items: center; padding: 22px 26px; border-radius: 26px; font-size: 36px; margin-top: 12px; background: var(--bg); }
+.offer b { font-weight: 700; }
+.offer.best { background: var(--accent); color: var(--accent-fg); }
+#clockchip { left: 72px; top: 640px; }
+
+/* 24h */
+#clock { left: 640px; top: 1060px; width: 340px; height: 340px; }
+#clock .face { fill: var(--card); stroke: var(--line); stroke-width: 3; }
+#clock .tk { stroke: var(--muted); stroke-width: 4; stroke-linecap: round; }
+#clock .hand { stroke: var(--fg); stroke-linecap: round; }
+
+/* sonia */
+#scard { left: 72px; top: 520px; width: 936px; border-radius: 34px; overflow: hidden; background: #fff; box-shadow: 0 40px 90px rgba(0,0,0,0.25); }
+#scard img { display: block; width: 100%; }
+#quote { left: 72px; top: 1150px; width: 936px; }
+
+/* end */
+#bird { left: 72px; top: 300px; width: 400px; }
+</style>
+</head>
+<body>
+<div id="stage">
+  <img class="abs" id="mark" src="bird_ink.png" alt="">
+
+  <!-- A: hook (on screen at frame 0) -->
+  <section class="scene" id="sA">
+    <div class="abs eyebrow" id="a0" style="left:72px; top:470px">Crédito CLT</div>
+    <div class="abs d" id="aT" data-fit="900" style="left:72px; top:540px; font-size:150px; white-space:nowrap">
+      <div class="ln"><span id="a1">Já pediu</span></div>
+      <div class="ln"><span id="a2">empréstimo e só</span></div>
+      <div class="ln"><span id="a3">te mostraram</span></div>
+      <div class="ln"><span id="a4"><span class="hl" id="a4hl"><em>uma opção?</em></span></span></div>
+    </div>
+  </section>
+
+  <!-- B: the turn -->
+  <section class="scene" id="sB">
+    <div class="abs d" id="bT" data-fit="900" style="left:72px; top:620px; font-size:150px; white-space:nowrap">
+      <div class="ln"><span id="b1">Na Phoenix</span></div>
+      <div class="ln"><span id="b2">Brasil, você</span></div>
+      <div class="ln"><span id="b3">vê <span class="hl" id="b3hl"><em>várias.</em></span></span></div>
+    </div>
+  </section>
+
+  <!-- C: map -->
+  <section class="scene" id="sC">
+    <div class="abs d" id="c1" data-fit="900" style="left:72px; top:400px; font-size:104px; white-space:nowrap">Atendemos o <em>Brasil todo.</em></div>
+    <svg class="abs" id="map" viewBox="0 0 900 870"></svg>
+    <div class="abs" id="c2" style="left:72px; top:1340px; display:flex; align-items:baseline; gap:24px">
+      <span class="d" style="font-size:150px">+<span id="n5k">0</span></span><span class="t" style="font-size:44px; line-height:1.1">clientes<br>atendidos</span>
+    </div>
+  </section>
+
+  <!-- D: banks -->
+  <section class="scene" id="sD">
+    <div class="abs" id="d1row" data-fit="900" style="left:60px; top:420px; display:flex; align-items:center; gap:34px; white-space:nowrap; font-size:100px">
+      <span class="d" style="font-size:3.3em">+<span id="n20">0</span></span>
+      <span class="d" style="font-size:0.92em; line-height:1">bancos<br><em>parceiros</em></span>
+    </div>
+    <div class="abs t" style="left:72px; top:800px; font-size:52px"><div class="ln"><span id="d2">comparados ao mesmo tempo.</span></div></div>
+    <div class="abs grid" style="left:72px; top:930px">
+      <div class="bank" id="g0"><img src="logos/0_BancoBMG.png" alt="BMG"></div>
+      <div class="bank" id="g1"><img src="logos/2_C6Bank.png" alt="C6 Bank"></div>
+      <div class="bank" id="g2"><img src="logos/3_BancoMercantil.png" alt="Mercantil"></div>
+      <div class="bank" id="g3"><img src="logos/1_Facta.png" alt="Facta" style="max-height:94%"></div>
+      <div class="bank" id="g4"><img src="logos/4_V8Digital.png" alt="V8 Digital" style="max-height:98%"></div>
+      <div class="bank more" id="g5">+15</div>
+    </div>
+  </section>
+
+  <!-- E: Nix -->
+  <section class="scene" id="sE">
+    <div class="abs d" id="e1" data-fit="900" style="left:72px; top:400px; font-size:96px; white-space:nowrap">Quem compara<br>é a <span class="hl" id="e1hl"><em>Nix.</em></span></div>
+    <div class="abs" id="clockchip"><span class="pill solid" style="font-size:32px; padding:12px 26px">🌙 03:12 da manhã</span></div>
+    <div class="abs chat" id="chat">
+      <div class="msg me" id="m1">Quero simular o crédito CLT</div>
+      <div id="m2w">
+        <div class="who"><span class="av"><img src="bird_white.png" alt=""></span>Nix · IA da Phoenix Brasil</div>
+        <div class="msg nix typing" id="ty"><b></b><b></b><b></b></div>
+        <div class="msg nix" id="m2" style="max-width:100%; width:860px">
+          <div>Comparando <b id="nb">0</b> bancos…</div>
+          <div class="bar"><i id="bar"></i></div>
+          <div class="offer" id="o1"><span>Banco A</span><b>48x R$ 176</b></div>
+          <div class="offer" id="o2"><span>Banco B</span><b>48x R$ 189</b></div>
+          <div class="offer best" id="o3"><span>Banco C · <b>melhor oferta</b></span><b>R$ 5.000</b></div>
+        </div>
+      </div>
+      <div class="msg nix" id="m3">Achei! Você começa a pagar em <b>até 90 dias</b>. 🎉</div>
+    </div>
+    <div class="abs" id="e9" style="left:72px; top:1480px; font-size:26px; color:var(--muted)">Simulação ilustrativa.</div>
+  </section>
+
+  <!-- F: 24h -->
+  <section class="scene" id="sF">
+    <div class="abs d" id="f1" style="left:60px; top:520px; font-size:340px; line-height:0.85">24h</div>
+    <svg class="abs" id="clock" viewBox="0 0 200 200">
+      <circle class="face" cx="100" cy="100" r="92"/><g id="ticks"></g>
+      <line class="hand" id="hH" x1="100" y1="100" x2="100" y2="58" stroke-width="8"/>
+      <line class="hand" id="hM" x1="100" y1="100" x2="100" y2="30" stroke-width="5"/>
+      <circle cx="100" cy="100" r="7" fill="currentColor"/>
+    </svg>
+    <div class="abs d" id="f2" style="left:72px; top:840px; font-size:120px"><em>por dia.</em></div>
+    <div class="abs t" style="left:72px; top:1110px; font-size:52px; line-height:1.25">
+      <div class="ln"><span id="f3">A Nix te atende a hora</span></div>
+      <div class="ln"><span id="f4">que você quiser.</span></div>
+    </div>
+    <div class="abs" id="f5" style="left:72px; top:1290px; font-size:34px; color:var(--muted); font-weight:600">Especialistas em horário comercial.</div>
+  </section>
+
+  <!-- G: Sônia (Instagram collab) -->
+  <section class="scene" id="sG">
+    <div class="abs eyebrow" id="g0e" style="left:72px; top:420px">Na TV e no Instagram</div>
+    <div class="abs" id="scard"><img src="sonia_card.png" alt="Post de Sônia Abrão em colaboração com a Phoenix Brasil"></div>
+    <div class="abs" id="quote">
+      <div class="d" style="font-size:66px; line-height:1.1">“…inclusive para quem está <span class="hl" id="qhl"><em>negativado.</em></span>”</div>
+      <div class="t" style="font-size:36px; color:var(--muted); margin-top:18px">— Sônia Abrão, <span style="color:var(--fg)">A Tarde é Sua</span></div>
+    </div>
+    <div class="abs" id="likes" style="left:620px; top:470px"><span class="pill acc" style="font-size:34px; padding:14px 28px">♥ 10,6 mil curtidas</span></div>
+  </section>
+
+  <!-- H: end -->
+  <section class="scene" id="sH">
+    <img class="abs" id="bird" src="bird_ink.png" alt="Phoenix Brasil">
+    <div class="abs" id="h1" data-fit="900" style="left:72px; top:760px; font-family:'DM Serif Display',serif; font-size:124px; letter-spacing:-2px; line-height:1; white-space:nowrap">phoenix brasil</div>
+    <div class="abs" id="h1b" style="left:76px; top:900px; font-size:26px; letter-spacing:0.5em; text-transform:uppercase; color:var(--muted); font-weight:600">Soluções Financeiras</div>
+    <div class="abs t" style="left:72px; top:1020px; font-size:56px"><div class="ln"><span id="h2">Simule grátis com a Nix:</span></div></div>
+    <div class="abs" id="h3" data-fit="900" style="left:72px; top:1110px; font-size:100px; font-weight:700; letter-spacing:-0.04em; white-space:nowrap"><span class="hl" id="h3hl">phoenixbrasil.com/clt</span></div>
+    <div class="abs" id="h4" style="left:72px; top:1270px"><span class="pill solid" style="font-size:34px">🛡 Nunca pedimos valor antecipado</span></div>
+    <div class="abs" id="h5" style="left:72px; top:1390px; width:900px; font-size:28px; line-height:1.4; color:var(--muted)">Correspondente bancário autorizado · Sujeito à análise de crédito.<br>Carência conforme a instituição. Simulação ilustrativa.</div>
+  </section>
+
+  <div id="wipe"></div>
+</div>
+
+<script src="br_paths.js"></script>
+<script>
+const Q = new URLSearchParams(location.search);
+const THEME = Q.get('theme') === 'orange' ? 'orange' : 'pastel';
+document.body.className = THEME;
+const INK = THEME === 'pastel' ? 'bird_ink.png' : 'bird_white.png';
+document.getElementById('mark').src = INK;
+document.getElementById('bird').src = INK;
+
+const $ = id => document.getElementById(id);
+const NS = 'http://www.w3.org/2000/svg';
+const clamp = (x, a = 0, b = 1) => Math.min(b, Math.max(a, x));
+const lerp = (a, b, t) => a + (b - a) * t;
+const easeOutExpo = t => t >= 1 ? 1 : 1 - Math.pow(2, -10 * t);
+const easeOutBack = t => { const c = 1.7; return 1 + (c + 1) * Math.pow(t - 1, 3) + c * Math.pow(t - 1, 2); };
+const easeInCubic = t => t * t * t;
+const easeInOutCubic = t => t < .5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
+const prog = (t, s, d) => clamp((t - s) / d);
+const hex = h => [1, 3, 5].map(i => parseInt(h.slice(i, i + 2), 16));
+const mix = (a, b, k) => `rgb(${a.map((v, i) => Math.round(lerp(v, b[i], k))).join(',')})`;
+
+// ---- beat grid (100 BPM). Scene lengths respect reading time: ≥ 0.3 s/word + 1 s
+const BPM = 100, B = 60 / BPM, at = b => b * B;
+const SCENES = [['sA', 0, 8], ['sB', 8, 14], ['sC', 14, 24], ['sD', 24, 32], ['sE', 32, 50], ['sF', 50, 56], ['sG', 56, 66], ['sH', 66, 82]];
+const DURATION = at(82);
+const MUSIC = { drop: 8, arp_from: 14, arp_to: 56, end: 66 };
+
+// ---- map
+const map = $('map');
+const home = BR.states.find(s => s.s === 'MG').c;
+const PAL = THEME === 'pastel'
+  ? ['#D6E5D8', '#EDD9D2', '#D2DCE8', '#EDE8D6'].map(hex)
+  : ['#F47B20', '#C85F14', '#FF9A4D', '#A84E10'].map(hex);
+const BASE = hex(THEME === 'pastel' ? '#FFFFFF' : '#17171B');
+const states = BR.states.map((s, i) => {
+  const p = document.createElementNS(NS, 'path'); p.setAttribute('d', s.d); map.appendChild(p);
+  return { ...s, el: p, col: PAL[i % 4], dist: Math.hypot(s.c[0] - home[0], s.c[1] - home[1]) };
+});
+const maxDist = Math.max(...states.map(s => s.dist));
+states.forEach(s => {
+  const d = document.createElementNS(NS, 'circle'); d.setAttribute('cx', s.c[0]); d.setAttribute('cy', s.c[1]);
+  d.setAttribute('fill', THEME === 'pastel' ? '#111' : '#fff'); map.appendChild(d); s.dot = d;
+});
+const stateAt = s => 15 + 4 * (s.dist / maxDist);   // beat at which a state lights up
+
+// clock ticks
+for (let i = 0; i < 12; i++) {
+  const a = i * Math.PI / 6, l = document.createElementNS(NS, 'line');
+  l.setAttribute('class', 'tk');
+  l.setAttribute('x1', 100 + 76 * Math.sin(a)); l.setAttribute('y1', 100 - 76 * Math.cos(a));
+  l.setAttribute('x2', 100 + 86 * Math.sin(a)); l.setAttribute('y2', 100 - 86 * Math.cos(a));
+  $('ticks').appendChild(l);
+}
+
+// ---- primitives
+function lineIn(id, t, b0) {
+  const p = easeOutExpo(prog(t, at(b0), 0.55));
+  $(id).style.transform = `translateY(${(1 - p) * 115}%)`;
+}
+function slam(id, t, b0, o = {}) {
+  const p = prog(t, at(b0), o.dur ?? 0.32);
+  $(id).style.opacity = clamp(p * 4);
+  $(id).style.transform = `scale(${p <= 0 ? 0 : lerp(o.from ?? 1.3, 1, easeOutBack(p))}) rotate(${(o.rot ?? 0) * (1 - easeOutExpo(p))}deg)`;
+}
+function slide(id, t, b0, dx = 0, dy = 80, dur = 0.5) {
+  const p = easeOutExpo(prog(t, at(b0), dur));
+  $(id).style.opacity = clamp(p * 3);
+  $(id).style.transform = `translate(${(1 - p) * dx}px, ${(1 - p) * dy}px)`;
+}
+function bubble(id, t, b0, b1 = null) {
+  const on = t >= at(b0) && (b1 == null || t < at(b1));
+  $(id).style.display = on ? '' : 'none';
+  if (!on) return;
+  const p = prog(t, at(b0), 0.4);
+  $(id).style.opacity = clamp(p * 3);
+  $(id).style.transform = `translateY(${(1 - easeOutExpo(p)) * 40}px) scale(${lerp(0.9, 1, easeOutBack(p))})`;
+}
+function highlight(id, t, b0) {
+  const k = easeOutExpo(prog(t, at(b0), 0.45));
+  $(id).style.setProperty('--hl', k);
+  if (THEME === 'orange') { $(id).style.color = k > 0.5 ? 'var(--accent-fg)' : ''; const em = $(id).querySelector('em'); if (em) em.style.color = k > 0.5 ? 'var(--accent-fg)' : ''; }
+}
+const ctr = (t, b0, beats, max) => Math.round(max * easeOutExpo(prog(t, at(b0), at(beats))));
+const COUNTERS = [{ b0: 17, beats: 4, max: 5000 }, { b0: 24.5, beats: 3, max: 20 }, { b0: 38.5, beats: 3, max: 20 }];
+
+function fitAll() {
+  for (const el of document.querySelectorAll('[data-fit]')) {
+    const sc = el.closest('.scene'), prev = sc.style.display; sc.style.display = 'block';
+    let fs = parseFloat(getComputedStyle(el).fontSize);
+    while (el.scrollWidth > +el.dataset.fit && fs > 20) { fs -= 2; el.style.fontSize = fs + 'px'; }
+    sc.style.display = prev;
+  }
+}
+
+function render(t) {
+  const beat = t / B;
+  for (const [id, a, b] of SCENES) $(id).style.display = (beat >= a && beat < b) ? 'block' : 'none';
+
+  // brand mark: always present on content scenes, hands over to the big bird at the end
+  $('mark').style.display = beat < 66 ? 'block' : 'none';
+  $('mark').style.transform = `rotate(${3 * Math.sin(t * 1.4)}deg)`;
+
+  // wipes into the brand turn (b8), the TV moment (b56) and the end card (b66)
+  let wy = 100;
+  for (const cut of [8, 56, 66]) { const w = (t - at(cut) + 0.24) / 0.48; if (w > 0 && w < 1) wy = lerp(100, -100, easeInOutCubic(w)); }
+  $('wipe').style.transform = `translateY(${wy}%)`;
+
+  // A — hook. Lines 1–3 are already set at t=0; "uma opção?" lands on beat 2 and holds.
+  $('a0').style.opacity = 1;
+  for (const id of ['a1', 'a2', 'a3']) $(id).style.transform = 'none';
+  lineIn('a4', t, 1.5);
+  highlight('a4hl', t, 2.5);
+
+  // B — the turn
+  lineIn('b1', t, 8.2); lineIn('b2', t, 8.7); lineIn('b3', t, 9.4);
+  highlight('b3hl', t, 10.4);
+
+  // C — map + clients
+  slide('c1', t, 14, -60, 0, 0.45);
+  for (const s of states) {
+    const k = easeOutExpo(prog(t, at(stateAt(s)), 0.5));
+    s.el.style.fill = mix(BASE, s.col, k);
+    s.el.style.stroke = THEME === 'pastel' ? mix(hex('#C8C3BC'), [255, 255, 255], k) : mix(hex('#3A3A42'), hex('#0B0B0D'), k);
+    s.dot.setAttribute('r', 7 * easeOutBack(prog(t, at(stateAt(s)) + 0.1, 0.4)));
+  }
+  slide('map', t, 14.2, 0, 60, 0.5);
+  slide('c2', t, 17, 0, 60, 0.45);
+  $('n5k').textContent = ctr(t, 17, 4, 5000).toLocaleString('pt-BR');
+
+  // D — banks
+  slam('d1row', t, 24.5, { from: 0.7, dur: 0.4 });
+  $('n20').textContent = ctr(t, 24.5, 3, 20);
+  lineIn('d2', t, 25.5);
+  for (let i = 0; i < 6; i++) slam('g' + i, t, 26.5 + i * 0.5, { from: 0.4, dur: 0.3 });
+
+  // E — Nix chat, big and legible
+  slide('e1', t, 32, -60, 0, 0.45);
+  highlight('e1hl', t, 33);
+  slide('clockchip', t, 33.5, -40, 0, 0.4);
+  bubble('m1', t, 35);
+  $('m2w').style.display = beat >= 36 ? '' : 'none';
+  bubble('ty', t, 36, 38);
+  for (let i = 0; i < 3; i++) $('ty').children[i].style.transform = `translateY(${-9 * Math.max(0, Math.sin(t * 9 - i * 0.9))}px)`;
+  bubble('m2', t, 38);
+  $('nb').textContent = ctr(t, 38.5, 3, 20);
+  $('bar').style.width = (100 * easeInOutCubic(prog(t, at(38.5), at(3)))) + '%';
+  bubble('o1', t, 40); bubble('o2', t, 41); bubble('o3', t, 42);
+  $('o3').style.transform += ` scale(${1 + 0.05 * Math.sin(Math.PI * prog(t, at(42.5), 0.4))})`;
+  bubble('m3', t, 44);
+  slide('e9', t, 38, 0, 0, 0.5);
+
+  // F — 24h
+  slam('f1', t, 50, { from: 0.6, dur: 0.45 });
+  slide('clock', t, 50.5, 80, 0, 0.5);
+  const day = easeInOutCubic(prog(t, at(50.5), at(4))) * 24 + 3.2;
+  $('hH').setAttribute('transform', `rotate(${day * 30} 100 100)`);
+  $('hM').setAttribute('transform', `rotate(${day * 360} 100 100)`);
+  slam('f2', t, 51, { from: 1.3 });
+  lineIn('f3', t, 52); lineIn('f4', t, 52.5);
+  slide('f5', t, 53.5, 0, 30, 0.4);
+
+  // G — Sônia Abrão collab post
+  slide('g0e', t, 56.2, -40, 0, 0.4);
+  slide('scard', t, 56.5, 0, 220, 0.6);
+  $('scard').querySelector('img').style.transform = `scale(${1 + 0.05 * prog(t, at(56.5), at(9))})`;
+  slam('likes', t, 58, { from: 1.6, rot: 8, dur: 0.35 });
+  slide('quote', t, 59, 0, 60, 0.5);
+  highlight('qhl', t, 60.5);
+
+  // H — end card: the phoenix rises
+  const bi = prog(t, at(66), 0.6);
+  $('bird').style.opacity = clamp(bi * 3);
+  $('bird').style.transform = `translateY(${(1 - easeOutExpo(bi)) * 160}px) scale(${lerp(0.7, 1, easeOutBack(bi))})`;
+  slide('h1', t, 67, -60, 0, 0.45);
+  slide('h1b', t, 67.5, -40, 0, 0.4);
+  lineIn('h2', t, 68.5);
+  slam('h3', t, 69.5, { from: 1.25, dur: 0.35 });
+  highlight('h3hl', t, 70);
+  slide('h4', t, 71.5, 0, 50, 0.4);
+  slide('h5', t, 73, 0, 0, 0.6);
+}
+
+function cues() {
+  const c = [], add = (b, type, gain = 1) => c.push({ t: +at(b).toFixed(3), type, gain });
+  add(0, 'tick2', 0.6); add(1.5, 'swipe', 0.5); add(2.5, 'hit', 0.8);
+  add(7.76, 'whoosh'); add(8, 'boom', 0.5); add(10.4, 'swipe', 0.6);
+  add(14, 'whoosh', 0.7);
+  for (const s of states) add(stateAt(s) + 0.1, 'tick2', 0.25);
+  add(24.5, 'hit'); for (let i = 0; i < 6; i++) add(26.5 + i * 0.5, 'pop', 0.7);
+  add(32, 'whoosh', 0.7); add(33, 'swipe', 0.5); add(33.5, 'pop', 0.6);
+  for (let i = 0; i < 6; i++) add(34 + i * 0.15, 'key', 0.6);
+  add(35, 'send'); add(36, 'plim', 0.7); add(38, 'pop', 0.6);
+  [40, 41, 42].forEach(b => add(b, 'pop', 0.6)); add(42.5, 'ding', 0.8); add(44, 'plim');
+  add(50, 'hit'); add(51, 'swipe', 0.5);
+  add(55.5, 'riser', 0.8); add(56, 'whoosh'); add(58, 'stamp', 0.8); add(58.3, 'shimmer'); add(60.5, 'swipe', 0.6);
+  add(65.5, 'riser'); add(66, 'boom'); add(67, 'pop', 0.5); add(69.5, 'hit', 0.8); add(70, 'swipe', 0.5); add(71.5, 'pop', 0.6);
+  for (const k of COUNTERS) {
+    let last = -1, lastT = -1;
+    for (let f = Math.floor(at(k.b0) * 60); f <= at(k.b0 + k.beats) * 60; f++) {
+      const tt = f / 60, v = Math.round(k.max * easeOutExpo(prog(tt, at(k.b0), at(k.beats))));
+      if (v !== last && tt - lastT >= 0.05) { c.push({ t: +tt.toFixed(3), type: 'tick', gain: 0.5 }); last = v; lastT = tt; }
+    }
+  }
+  let lastH = -1;
+  for (let f = Math.floor(at(50.5) * 60); f <= at(54.5) * 60; f++) {
+    const h = Math.floor(easeInOutCubic(prog(f / 60, at(50.5), at(4))) * 24);
+    if (h !== lastH) { c.push({ t: +(f / 60).toFixed(3), type: 'tick', gain: 0.3 }); lastH = h; }
+  }
+  return c.sort((a, b) => a.t - b.t);
+}
+
+window.fitAll = fitAll; window.BPM = BPM; window.DURATION = DURATION; window.MUSIC = MUSIC;
+window.render = render; window.cues = cues;
+render(Number(Q.get('t') || 0));
+</script>
+</body>
+</html>
