@@ -13,7 +13,7 @@ const fs = require('fs');
   await page.evaluate(() => document.fonts.ready);
   await page.waitForTimeout(300);
   await page.evaluate(async () => {
-    await Promise.all(['400 20px Poppins', '600 20px Poppins', '700 20px Poppins', '20px "DM Serif Display"'].map(f => document.fonts.load(f)));
+    await Promise.all([...document.fonts].map(f => f.load()));
     window.fitAll && window.fitAll();
   });
 

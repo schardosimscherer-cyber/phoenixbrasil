@@ -8,6 +8,17 @@
 @font-face { font-family: Poppins; font-weight: 700; src: url(Poppins-700.ttf); }
 @font-face { font-family: 'DM Serif Display'; font-weight: 400; src: url(DMSerifDisplay-400.ttf); }
 
+@font-face { font-family: cBebas; src: url(BebasNeue.ttf); }
+@font-face { font-family: cPlayfair; src: url(PlayfairDisplay.ttf); }
+@font-face { font-family: cMono; src: url(SpaceMono.ttf); }
+@font-face { font-family: cPacifico; src: url(Pacifico.ttf); }
+@font-face { font-family: cAnton; src: url(Anton.ttf); }
+@font-face { font-family: cAbril; src: url(AbrilFatface.ttf); }
+@font-face { font-family: cCaveat; src: url(Caveat.ttf); }
+@font-face { font-family: cRubik; src: url(RubikMonoOne.ttf); }
+@font-face { font-family: cRighteous; src: url(Righteous.ttf); }
+@font-face { font-family: cLobster; src: url(Lobster.ttf); }
+
 /* Themes — see /Motion.md */
 body.pastel {
   --bg: #F8F6F2; --fg: #111111; --soft: #555555; --muted: #8A8A8A; --line: #E2DDD8; --card: #FFFFFF;
@@ -32,6 +43,7 @@ html, body { width: 1080px; height: 1920px; overflow: hidden; background: var(--
 .eyebrow { font-weight: 600; font-size: 30px; letter-spacing: 0.3em; text-transform: uppercase; color: var(--muted); }
 .ln { overflow: hidden; padding: 0.06em 0 0.12em; margin: -0.06em 0 -0.12em; }
 .ln > span { display: inline-block; will-change: transform; }
+.cyc { display: inline-block; white-space: nowrap; margin-left: 0.1em; }
 .hl { position: relative; display: inline-block; z-index: 0; }
 .hl::before { content: ''; position: absolute; left: -0.1em; right: -0.1em; top: 0.1em; bottom: 0.02em; background: var(--accent); z-index: -1;
   transform-origin: left; transform: scaleX(var(--hl, 0)); border-radius: 10px; }
@@ -95,7 +107,7 @@ html, body { width: 1080px; height: 1920px; overflow: hidden; background: var(--
       <div class="ln"><span id="a1">Já pediu</span></div>
       <div class="ln"><span id="a2">empréstimo e só</span></div>
       <div class="ln"><span id="a3">te mostraram</span></div>
-      <div class="ln"><span id="a4"><span class="hl" id="a4hl"><em>uma opção?</em></span></span></div>
+      <div class="ln" id="a4ln"><span id="a4"><span class="hl" id="a4hl"><em>uma <span class="cyc" id="cyc1">opção?</span></em></span></span></div>
     </div>
   </section>
 
@@ -104,7 +116,7 @@ html, body { width: 1080px; height: 1920px; overflow: hidden; background: var(--
     <div class="abs d" id="bT" data-fit="900" style="left:72px; top:620px; font-size:150px; white-space:nowrap">
       <div class="ln"><span id="b1">Na Phoenix</span></div>
       <div class="ln"><span id="b2">Brasil, você</span></div>
-      <div class="ln"><span id="b3">vê <span class="hl" id="b3hl"><em>várias.</em></span></span></div>
+      <div class="ln" id="b3ln"><span id="b3">vê <span class="hl" id="b3hl"><em><span class="cyc" id="cyc2">várias.</span></em></span></span></div>
     </div>
   </section>
 
@@ -113,7 +125,7 @@ html, body { width: 1080px; height: 1920px; overflow: hidden; background: var(--
     <div class="abs d" id="c1" data-fit="900" style="left:72px; top:400px; font-size:104px; white-space:nowrap">Atendemos o <em>Brasil todo.</em></div>
     <svg class="abs" id="map" viewBox="0 0 900 870"></svg>
     <div class="abs" id="c2" style="left:72px; top:1340px; display:flex; align-items:baseline; gap:24px">
-      <span class="d" style="font-size:150px">+<span id="n5k">0</span></span><span class="t" style="font-size:44px; line-height:1.1">clientes<br>atendidos</span>
+      <span class="d" style="font-size:150px">+<span id="n5k">0</span></span><span class="t" style="font-size:44px; line-height:1.1">pessoas<br>atendidas</span>
     </div>
   </section>
 
@@ -243,6 +255,37 @@ states.forEach(s => {
 });
 const stateAt = s => 15 + 4 * (s.dist / maxDist);   // beat at which a state lights up
 
+// ---- illustrated people popping up over the map (fictional avatars, drawn in code)
+const SKIN = ['#F1C27D', '#8D5524', '#E0AC69', '#FFDBAC', '#C68642', '#6B3E26'];
+const HAIR = ['#2C1B10', '#111111', '#5A3825', '#A0522D', '#D8B26E', '#3B2A20'];
+const SHIRT = THEME === 'pastel' ? ['#D2DCE8', '#111111', '#EDD9D2', '#D6E5D8', '#EDE8D6'] : ['#F47B20', '#FFFFFF', '#C85F14', '#FF9A4D', '#3A3A42'];
+const BG_AV = THEME === 'pastel' ? '#FFFFFF' : '#1E1E23';
+const RING = THEME === 'pastel' ? '#111111' : '#F47B20';
+const PEOPLE = ['AM', 'PA', 'CE', 'BA', 'MG', 'SP', 'RJ', 'PR', 'RS', 'GO', 'MT', 'PE'];
+const HAIRSTYLES = ['short', 'long', 'curly', 'bun', 'short', 'long'];
+function avatarSVG(i) {
+  const skin = SKIN[i % SKIN.length], hair = HAIR[(i * 5) % HAIR.length], shirt = SHIRT[i % SHIRT.length];
+  const style = HAIRSTYLES[i % HAIRSTYLES.length];
+  const back = style === 'long' ? `<path d="M30 40 Q30 18 50 18 Q70 18 70 40 L72 72 L28 72 Z" fill="${hair}"/>` : '';
+  const front = {
+    short: `<path d="M33 40 Q33 22 50 22 Q67 22 67 40 Q60 30 50 31 Q40 30 33 40 Z" fill="${hair}"/>`,
+    long: `<path d="M33 42 Q33 22 50 22 Q67 22 67 42 Q62 30 50 30 Q38 30 33 42 Z" fill="${hair}"/>`,
+    curly: [[36, 30], [43, 24], [51, 22], [59, 25], [65, 31], [34, 38], [66, 38]].map(([x, y]) => `<circle cx="${x}" cy="${y}" r="7" fill="${hair}"/>`).join(''),
+    bun: `<circle cx="50" cy="17" r="8" fill="${hair}"/><path d="M33 40 Q33 23 50 23 Q67 23 67 40 Q60 31 50 31 Q40 31 33 40 Z" fill="${hair}"/>`,
+  }[style];
+  return `<clipPath id="av${i}"><circle cx="50" cy="50" r="46"/></clipPath>
+    <circle cx="50" cy="50" r="49" fill="${RING}"/><circle cx="50" cy="50" r="46" fill="${BG_AV}"/>
+    <g clip-path="url(#av${i})">${back}
+      <ellipse cx="50" cy="100" rx="34" ry="28" fill="${shirt}"/>
+      <rect x="44" y="54" width="12" height="14" rx="5" fill="${skin}"/>
+      <circle cx="50" cy="42" r="16" fill="${skin}"/>${front}</g>`;
+}
+const avatars = PEOPLE.map((sig, i) => {
+  const s = states.find(x => x.s === sig); if (!s) return null;
+  const g = document.createElementNS(NS, 'g'); g.innerHTML = avatarSVG(i); map.appendChild(g);
+  return { g, s, b0: stateAt(s) + 0.4 + (i % 3) * 0.15 };
+}).filter(Boolean);
+
 // clock ticks
 for (let i = 0; i < 12; i++) {
   const a = i * Math.PI / 6, l = document.createElementNS(NS, 'line');
@@ -280,10 +323,46 @@ function highlight(id, t, b0) {
   $(id).style.setProperty('--hl', k);
   if (THEME === 'orange') { $(id).style.color = k > 0.5 ? 'var(--accent-fg)' : ''; const em = $(id).querySelector('em'); if (em) em.style.color = k > 0.5 ? 'var(--accent-fg)' : ''; }
 }
+// ---- font cycling: the word changes typeface every half-beat, then lands on the brand face
+const CYC_FONTS = [['cBebas', 'normal'], ['cPlayfair', 'italic'], ['cMono', 'normal'], ['cPacifico', 'normal'],
+  ['cAnton', 'normal'], ['cAbril', 'normal'], ['cCaveat', 'normal'], ['cRubik', 'normal'], ['cRighteous', 'normal'], ['cLobster', 'normal']];
+const CYCLES = [
+  { id: 'cyc1', ln: 'a4ln', b0: 1.5, step: 0.5, seq: [0, 1, 2, 3, 4, 5, 6, 7], settle: 5.5 },
+  { id: 'cyc2', ln: 'b3ln', b0: 9.4, step: 0.5, seq: [8, 1, 9, 0], settle: 11.4 },
+];
+const cycScale = {};
+function measureCycles() {
+  for (const c of CYCLES) {
+    const el = $(c.id), sc = el.closest('.scene'), prev = sc.style.display;
+    sc.style.display = 'block';
+    el.style.fontFamily = ''; el.style.fontStyle = ''; el.style.fontSize = '';
+    const target = el.getBoundingClientRect().width;
+    cycScale[c.id] = CYC_FONTS.map(([f, st]) => {
+      el.style.fontFamily = f; el.style.fontStyle = st;
+      return clamp(target / el.getBoundingClientRect().width, 0.72, 1.12);
+    });
+    el.style.fontFamily = ''; el.style.fontStyle = ''; el.style.fontSize = '';
+    sc.style.display = prev;
+  }
+}
+function cycle(c, t) {
+  const el = $(c.id), beat = t / B;
+  const i = Math.floor((beat - c.b0) / c.step);
+  const cycling = beat >= c.b0 && beat < c.settle && i >= 0;
+  $(c.ln).style.overflow = cycling || beat >= c.settle ? 'visible' : 'hidden';
+  if (!cycling) { el.style.fontFamily = ''; el.style.fontStyle = ''; el.style.fontSize = ''; el.style.transform = ''; return; }
+  const k = c.seq[Math.min(i, c.seq.length - 1)];
+  const [f, st] = CYC_FONTS[k];
+  el.style.fontFamily = f; el.style.fontStyle = st;
+  el.style.fontSize = (cycScale[c.id]?.[k] ?? 1) + 'em';
+  const p = ((beat - c.b0) / c.step) % 1;           // tiny punch on each swap
+  el.style.transform = `scale(${1 + 0.06 * (1 - easeOutExpo(clamp(p * 3)))})`;
+}
+
 const ctr = (t, b0, beats, max) => Math.round(max * easeOutExpo(prog(t, at(b0), at(beats))));
 const COUNTERS = [{ b0: 17, beats: 4, max: 5000 }, { b0: 24.5, beats: 3, max: 20 }, { b0: 38.5, beats: 3, max: 20 }];
 
-function fitAll() {
+function fitText() {
   for (const el of document.querySelectorAll('[data-fit]')) {
     const sc = el.closest('.scene'), prev = sc.style.display; sc.style.display = 'block';
     let fs = parseFloat(getComputedStyle(el).fontSize);
@@ -298,7 +377,6 @@ function render(t) {
 
   // brand mark: always present on content scenes, hands over to the big bird at the end
   $('mark').style.display = beat < 66 ? 'block' : 'none';
-  $('mark').style.transform = `rotate(${3 * Math.sin(t * 1.4)}deg)`;
 
   // wipes into the brand turn (b8), the TV moment (b56) and the end card (b66)
   let wy = 100;
@@ -309,11 +387,13 @@ function render(t) {
   $('a0').style.opacity = 1;
   for (const id of ['a1', 'a2', 'a3']) $(id).style.transform = 'none';
   lineIn('a4', t, 1.5);
-  highlight('a4hl', t, 2.5);
+  cycle(CYCLES[0], t);
+  highlight('a4hl', t, 5.5);
 
   // B — the turn
   lineIn('b1', t, 8.2); lineIn('b2', t, 8.7); lineIn('b3', t, 9.4);
-  highlight('b3hl', t, 10.4);
+  cycle(CYCLES[1], t);
+  highlight('b3hl', t, 11.4);
 
   // C — map + clients
   slide('c1', t, 14, -60, 0, 0.45);
@@ -324,6 +404,12 @@ function render(t) {
     s.dot.setAttribute('r', 7 * easeOutBack(prog(t, at(stateAt(s)) + 0.1, 0.4)));
   }
   slide('map', t, 14.2, 0, 60, 0.5);
+  for (const a of avatars) {
+    const p = prog(t, at(a.b0), 0.45);
+    const sc = p <= 0 ? 0 : 0.62 * easeOutBack(p);
+    const lift = -46 * easeOutExpo(p) - 6 * Math.sin(t * 2 + a.b0);
+    a.g.setAttribute('transform', `translate(${a.s.c[0]} ${a.s.c[1] + lift}) scale(${sc}) translate(-50 -50)`);
+  }
   slide('c2', t, 17, 0, 60, 0.45);
   $('n5k').textContent = ctr(t, 17, 4, 5000).toLocaleString('pt-BR');
 
@@ -382,10 +468,12 @@ function render(t) {
 
 function cues() {
   const c = [], add = (b, type, gain = 1) => c.push({ t: +at(b).toFixed(3), type, gain });
-  add(0, 'tick2', 0.6); add(1.5, 'swipe', 0.5); add(2.5, 'hit', 0.8);
-  add(7.76, 'whoosh'); add(8, 'boom', 0.5); add(10.4, 'swipe', 0.6);
+  add(0, 'tick2', 0.6); add(1.5, 'swipe', 0.5);
+  for (const c of CYCLES) { for (let i = 0; i < c.seq.length; i++) add(c.b0 + i * c.step, 'tick2', 0.55); add(c.settle, 'hit', 0.8); }
+  add(7.76, 'whoosh'); add(8, 'boom', 0.5); add(11.4, 'swipe', 0.5);
   add(14, 'whoosh', 0.7);
   for (const s of states) add(stateAt(s) + 0.1, 'tick2', 0.25);
+  for (const a of avatars) add(a.b0, 'pop', 0.4);
   add(24.5, 'hit'); for (let i = 0; i < 6; i++) add(26.5 + i * 0.5, 'pop', 0.7);
   add(32, 'whoosh', 0.7); add(33, 'swipe', 0.5); add(33.5, 'pop', 0.6);
   for (let i = 0; i < 6; i++) add(34 + i * 0.15, 'key', 0.6);
@@ -409,7 +497,7 @@ function cues() {
   return c.sort((a, b) => a.t - b.t);
 }
 
-window.fitAll = fitAll; window.BPM = BPM; window.DURATION = DURATION; window.MUSIC = MUSIC;
+window.fitAll = () => { fitText(); measureCycles(); }; window.BPM = BPM; window.DURATION = DURATION; window.MUSIC = MUSIC;
 window.render = render; window.cues = cues;
 render(Number(Q.get('t') || 0));
 </script>
