@@ -6,10 +6,10 @@ A história do vídeo da Nix (mapa, bancos, chat, 24h), refeita segundo `/Motion
 | Batidas (0,6s) | Cena |
 |---|---|
 | 0–8 | Gancho: "Já pediu empréstimo e só te mostraram *uma opção?*" (visível no quadro 0) |
-| 8–14 | "Na Phoenix Brasil, você vê *várias.*" |
+| 8–14 | "Na Phoenix Brasil, você recebe a *melhor.*" (a palavra troca de fonte, como a Nix comparando) |
 | 14–24 | Mapa do Brasil acendendo · +5.000 clientes atendidos |
 | 24–32 | +20 bancos parceiros · logos |
-| 32–50 | "Quem compara é a Nix." · conversa às 03:12 · melhor oferta · até 90 dias |
+| 32–50 | "Quem compara é a Nix." · conversa às 03:12 · 20 bancos consultados · um único cartão com a melhor oferta |
 | 50–56 | 24h por dia · especialistas em horário comercial |
 | 56–66 | Post em colaboração com Sônia Abrão (Instagram) · 10,6 mil curtidas · "inclusive para quem está negativado" |
 | 66–82 | Fênix · phoenixbrasil.com/clt · nunca pedimos valor antecipado · aviso legal |

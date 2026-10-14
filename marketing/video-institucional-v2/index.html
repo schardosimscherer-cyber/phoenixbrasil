@@ -115,8 +115,8 @@ html, body { width: 1080px; height: 1920px; overflow: hidden; background: var(--
   <section class="scene" id="sB">
     <div class="abs d" id="bT" data-fit="900" style="left:72px; top:620px; font-size:150px; white-space:nowrap">
       <div class="ln"><span id="b1">Na Phoenix</span></div>
-      <div class="ln"><span id="b2">Brasil, você</span></div>
-      <div class="ln" id="b3ln"><span id="b3">vê <span class="hl" id="b3hl"><em><span class="cyc" id="cyc2">várias.</span></em></span></span></div>
+      <div class="ln"><span id="b2">Brasil, você recebe</span></div>
+      <div class="ln" id="b3ln"><span id="b3">a <span class="hl" id="b3hl"><em><span class="cyc" id="cyc2">melhor.</span></em></span></span></div>
     </div>
   </section>
 
@@ -156,14 +156,16 @@ html, body { width: 1080px; height: 1920px; overflow: hidden; background: var(--
         <div class="who"><span class="av"><img src="bird_white.png" alt=""></span>Nix · IA da Phoenix Brasil</div>
         <div class="msg nix typing" id="ty"><b></b><b></b><b></b></div>
         <div class="msg nix" id="m2" style="max-width:100%; width:860px">
-          <div>Comparando <b id="nb">0</b> bancos…</div>
+          <div id="scanTxt">Comparando <b id="nb">0</b> bancos…</div>
           <div class="bar"><i id="bar"></i></div>
-          <div class="offer" id="o1"><span>Banco A</span><b>48x R$ 176</b></div>
-          <div class="offer" id="o2"><span>Banco B</span><b>48x R$ 189</b></div>
-          <div class="offer best" id="o3"><span>Banco C · <b>melhor oferta</b></span><b>R$ 5.000</b></div>
+          <div class="offer best" id="o3" style="flex-direction:column; align-items:flex-start; gap:6px; padding:28px 30px">
+            <span style="font-size:28px; font-weight:600; opacity:0.75">✓ Melhor oferta pra você</span>
+            <span style="font-size:64px; font-weight:700; letter-spacing:-0.03em; line-height:1">R$ 5.000</span>
+            <span style="font-size:32px">48x de R$ 192 · 1ª parcela em até 90 dias</span>
+          </div>
         </div>
       </div>
-      <div class="msg nix" id="m3">Achei! Você começa a pagar em <b>até 90 dias</b>. 🎉</div>
+      <div class="msg nix" id="m3">Comparei 20 bancos e <b>essa é a melhor pra você</b>. Vamos seguir? 🎉</div>
     </div>
     <div class="abs" id="e9" style="left:72px; top:1480px; font-size:26px; color:var(--muted)">Simulação ilustrativa.</div>
   </section>
@@ -321,7 +323,11 @@ function bubble(id, t, b0, b1 = null) {
 function highlight(id, t, b0) {
   const k = easeOutExpo(prog(t, at(b0), 0.45));
   $(id).style.setProperty('--hl', k);
-  if (THEME === 'orange') { $(id).style.color = k > 0.5 ? 'var(--accent-fg)' : ''; const em = $(id).querySelector('em'); if (em) em.style.color = k > 0.5 ? 'var(--accent-fg)' : ''; }
+  if (THEME === 'orange') {
+    // white while the marker sweeps (reads on dark and on orange), dark once it is fully drawn
+    const c = k > 0.97 ? 'var(--accent-fg)' : k > 0 ? 'var(--fg)' : '';
+    $(id).style.color = c; const em = $(id).querySelector('em'); if (em) em.style.color = c;
+  }
 }
 // ---- font cycling: the word changes typeface every half-beat, then lands on the brand face
 const CYC_FONTS = [['cBebas', 'normal'], ['cPlayfair', 'italic'], ['cMono', 'normal'], ['cPacifico', 'normal'],
@@ -428,9 +434,10 @@ function render(t) {
   bubble('ty', t, 36, 38);
   for (let i = 0; i < 3; i++) $('ty').children[i].style.transform = `translateY(${-9 * Math.max(0, Math.sin(t * 9 - i * 0.9))}px)`;
   bubble('m2', t, 38);
-  $('nb').textContent = ctr(t, 38.5, 3, 20);
   $('bar').style.width = (100 * easeInOutCubic(prog(t, at(38.5), at(3)))) + '%';
-  bubble('o1', t, 40); bubble('o2', t, 41); bubble('o3', t, 42);
+  if (beat >= 41.5) $('scanTxt').innerHTML = '<b>20 bancos</b> consultados ✓';
+  else $('scanTxt').innerHTML = `Comparando <b id="nb">${ctr(t, 38.5, 3, 20)}</b> bancos…`;
+  bubble('o3', t, 42);
   $('o3').style.transform += ` scale(${1 + 0.05 * Math.sin(Math.PI * prog(t, at(42.5), 0.4))})`;
   bubble('m3', t, 44);
   slide('e9', t, 38, 0, 0, 0.5);
@@ -478,7 +485,7 @@ function cues() {
   add(32, 'whoosh', 0.7); add(33, 'swipe', 0.5); add(33.5, 'pop', 0.6);
   for (let i = 0; i < 6; i++) add(34 + i * 0.15, 'key', 0.6);
   add(35, 'send'); add(36, 'plim', 0.7); add(38, 'pop', 0.6);
-  [40, 41, 42].forEach(b => add(b, 'pop', 0.6)); add(42.5, 'ding', 0.8); add(44, 'plim');
+  add(41.5, 'tick2', 0.6); add(42, 'pop', 0.7); add(42.5, 'ding', 0.8); add(44, 'plim');
   add(50, 'hit'); add(51, 'swipe', 0.5);
   add(55.5, 'riser', 0.8); add(56, 'whoosh'); add(58, 'stamp', 0.8); add(58.3, 'shimmer'); add(60.5, 'swipe', 0.6);
   add(65.5, 'riser'); add(66, 'boom'); add(67, 'pop', 0.5); add(69.5, 'hit', 0.8); add(70, 'swipe', 0.5); add(71.5, 'pop', 0.6);
