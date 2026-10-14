@@ -1,0 +1,452 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<style>
+@font-face { font-family: Poppins; font-weight: 400; src: url(Poppins-400.ttf); }
+@font-face { font-family: Poppins; font-weight: 600; src: url(Poppins-600.ttf); }
+@font-face { font-family: Poppins; font-weight: 700; src: url(Poppins-700.ttf); }
+@font-face { font-family: 'DM Serif Display'; font-weight: 400; src: url(DMSerifDisplay-400.ttf); }
+
+/* Phoenix Brasil brand tokens (from phoenixbrasil.com) */
+:root {
+  --bg: #F8F6F2; --bg-alt: #F0EDE8; --white: #FFFFFF; --ink: #111111; --ink-soft: #555555; --muted: #888888;
+  --sage: #D6E5D8; --blush: #EDD9D2; --slate: #D2DCE8; --warm: #EDE8D6;
+  --border: #E2DDD8; --border-dark: #C8C3BC; --wa: #25D366;
+}
+* { margin: 0; padding: 0; box-sizing: border-box; }
+html, body { width: 1080px; height: 1920px; overflow: hidden; background: var(--bg); }
+#stage { position: relative; width: 1080px; height: 1920px; overflow: hidden; background: var(--bg);
+  font-family: Poppins, sans-serif; color: var(--ink); -webkit-font-smoothing: antialiased; }
+
+.halo { position: absolute; width: 1300px; height: 1300px; left: -110px; border-radius: 50%; filter: blur(60px);
+  background: radial-gradient(circle, rgba(214,229,216,0.95) 0%, rgba(214,229,216,0.35) 40%, transparent 68%); }
+.scene { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; padding: 0 84px; }
+.el { will-change: transform, opacity, filter; }
+
+.eyebrow { font-weight: 600; font-size: 30px; letter-spacing: 9px; text-transform: uppercase; color: var(--muted); padding-left: 9px; }
+.display { font-family: 'DM Serif Display', serif; font-size: 128px; line-height: 1.05; letter-spacing: -3px; }
+.title { font-family: 'DM Serif Display', serif; font-size: 104px; line-height: 1.08; letter-spacing: -2px; }
+.title em, .display em { font-style: italic; color: var(--ink-soft); }
+.lead { font-size: 42px; line-height: 1.5; color: var(--ink-soft); }
+.serifnum { font-family: 'DM Serif Display', serif; font-variant-numeric: tabular-nums; }
+
+/* Map */
+#map { width: 900px; height: 870px; margin-top: 40px; overflow: visible; }
+#map path { fill: var(--white); stroke: var(--border-dark); stroke-width: 1.6; stroke-linejoin: round; }
+.dot { fill: var(--ink); }
+.ring { fill: none; stroke: var(--ink); stroke-width: 2.5; }
+.stat-line { display: flex; align-items: baseline; gap: 26px; margin-top: 30px; }
+.stat-line .v { font-size: 170px; line-height: 1; letter-spacing: -4px; }
+.stat-line .l { font-size: 40px; color: var(--ink-soft); text-align: left; line-height: 1.25; }
+
+/* Banks */
+.banks { display: grid; grid-template-columns: repeat(2, 400px); gap: 32px; margin-top: 80px; }
+.bank { height: 200px; border-radius: 40px; background: var(--white); border: 1.5px solid var(--border);
+  display: flex; align-items: center; justify-content: center; overflow: hidden; }
+.bank img { max-width: 78%; max-height: 64%; object-fit: contain; }
+.bank.more { background: var(--ink); color: #fff; border: 0; font-family: 'DM Serif Display', serif; font-size: 96px; letter-spacing: -2px; }
+.bank.more small { font-family: Poppins; font-size: 28px; letter-spacing: 0; margin-left: 14px; color: #bbb; }
+
+/* Phone + chat */
+#phone { position: relative; width: 820px; height: 1500px; border-radius: 110px; background: #0d0d0d; padding: 22px; margin-top: 40px;
+  box-shadow: 0 60px 120px rgba(17,17,17,0.18), 0 0 0 2px #2a2a2a inset; }
+.screen { position: relative; width: 100%; height: 100%; border-radius: 90px; background: var(--bg); overflow: hidden; text-align: left; }
+.island { position: absolute; top: 26px; left: 50%; width: 220px; height: 64px; margin-left: -110px; border-radius: 40px; background: #0d0d0d; z-index: 3; }
+.sbar { position: absolute; top: 34px; left: 70px; right: 70px; display: flex; justify-content: space-between; font-weight: 600; font-size: 34px; z-index: 2; }
+.chead { position: absolute; top: 120px; left: 0; right: 0; height: 150px; display: flex; align-items: center; gap: 26px; padding: 0 44px;
+  border-bottom: 1.5px solid var(--border); background: rgba(248,246,242,0.96); z-index: 2; }
+.avatar { width: 96px; height: 96px; border-radius: 50%; background: var(--ink); display: flex; align-items: center; justify-content: center; flex: 0 0 96px; }
+.avatar img { width: 62px; }
+.avatar img { width: 70px; }
+.chead .n { font-family: 'DM Serif Display', serif; font-size: 46px; line-height: 1; }
+.chead .s { font-size: 26px; color: var(--muted); margin-top: 8px; display: flex; align-items: center; gap: 10px; }
+.chead .s i { width: 14px; height: 14px; border-radius: 50%; background: var(--wa); display: inline-block; }
+.msgs { position: absolute; top: 290px; left: 0; right: 0; bottom: 150px; padding: 0 36px; display: flex; flex-direction: column; justify-content: flex-end; gap: 22px; }
+.msg { max-width: 82%; padding: 26px 32px; border-radius: 40px; font-size: 32px; line-height: 1.38; }
+.msg.me { align-self: flex-end; background: var(--ink); color: #fff; border-bottom-right-radius: 12px; }
+.msg.nix { align-self: flex-start; background: var(--white); border: 1.5px solid var(--border); border-bottom-left-radius: 12px; }
+.typing { align-self: flex-start; background: var(--white); border: 1.5px solid var(--border); border-radius: 40px; border-bottom-left-radius: 12px; padding: 30px 36px; display: flex; gap: 12px; }
+.typing b { width: 16px; height: 16px; border-radius: 50%; background: var(--muted); display: block; }
+.scan { align-self: stretch; background: var(--white); border: 1.5px solid var(--border); border-radius: 40px; padding: 30px 34px; }
+.scan .hd { display: flex; justify-content: space-between; font-weight: 600; font-size: 28px; color: var(--ink-soft); }
+.bar { height: 12px; border-radius: 10px; background: var(--bg-alt); margin: 18px 0 8px; overflow: hidden; }
+.bar i { display: block; height: 100%; width: 0; background: var(--ink); border-radius: 10px; }
+.offer { display: flex; justify-content: space-between; align-items: center; padding: 18px 22px; margin-top: 12px; border-radius: 24px; font-size: 28px; background: var(--bg); }
+.offer .bk { color: var(--ink-soft); }
+.offer .vl { font-weight: 600; white-space: nowrap; }
+.offer .bk { display: flex; flex-direction: column; align-items: flex-start; gap: 8px; }
+.offer.best { background: var(--blush); outline: 2.5px solid var(--ink); }
+.badge { display: inline-block; font-size: 22px; font-weight: 600; background: var(--ink); color: #fff; border-radius: 100px; padding: 6px 16px; }
+.input { position: absolute; left: 30px; right: 30px; bottom: 40px; height: 92px; border-radius: 60px; background: var(--white); border: 1.5px solid var(--border);
+  display: flex; align-items: center; padding: 0 36px; font-size: 30px; color: var(--ink); }
+.input .ph { color: #aaa; }
+.caret { display: inline-block; width: 3px; height: 38px; background: var(--ink); margin-left: 3px; vertical-align: middle; }
+.illus { position: absolute; bottom: 64px; left: 0; right: 0; text-align: center; font-size: 24px; color: var(--muted); }
+
+/* 24h clock */
+#clock { width: 420px; height: 420px; margin-top: 70px; }
+#clock .face { fill: var(--white); stroke: var(--border); stroke-width: 3; }
+#clock .tick { stroke: var(--border-dark); stroke-width: 4; stroke-linecap: round; }
+#clock .hand { stroke: var(--ink); stroke-linecap: round; }
+
+
+/* Authority: as seen on TV */
+#tv { position: relative; width: 940px; margin-top: 80px; }
+#tv .bezel { position: relative; border-radius: 34px; background: #0d0d0d; padding: 18px; box-shadow: 0 50px 100px rgba(17,17,17,0.22); }
+#tv .scr { position: relative; border-radius: 20px; overflow: hidden; aspect-ratio: 1184 / 665; background: #000; }
+#tv .scr img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; transform-origin: 70% 40%; }
+#tv .glare { position: absolute; top: -20%; bottom: -20%; width: 34%; background: linear-gradient(100deg, transparent, rgba(255,255,255,0.22), transparent); }
+#tv .stand { width: 220px; height: 14px; margin: 0 auto; border-radius: 0 0 14px 14px; background: #2a2a2a; }
+.onair { position: absolute; top: 34px; left: 34px; display: flex; align-items: center; gap: 12px; background: rgba(17,17,17,0.75); color: #fff;
+  font-weight: 600; font-size: 24px; letter-spacing: 3px; text-transform: uppercase; padding: 10px 20px; border-radius: 100px; }
+.onair i { width: 14px; height: 14px; border-radius: 50%; background: #E5484D; display: inline-block; }
+.authority-sub { font-size: 40px; color: var(--ink-soft); margin-top: 26px; }
+.authority-sub b { color: var(--ink); font-weight: 600; }
+.seal { display: inline-flex; align-items: center; gap: 16px; margin-top: 70px; padding: 22px 40px; border-radius: 100px; background: var(--ink); color: #fff; font-weight: 600; font-size: 32px; }
+.seal svg { width: 36px; height: 36px; fill: none; stroke: #fff; stroke-width: 2.4; stroke-linecap: round; stroke-linejoin: round; }
+
+/* Final */
+#bird { width: 440px; height: auto; }
+.wordmark { font-family: 'DM Serif Display', serif; font-size: 112px; letter-spacing: -2px; line-height: 1; margin-top: 50px; color: #fff; }
+.tagline { font-size: 26px; letter-spacing: 13px; text-transform: uppercase; color: #8a8a8a; margin-top: 22px; padding-left: 13px; font-weight: 600; }
+.cta { margin-top: 96px; display: inline-flex; align-items: center; gap: 22px; padding: 36px 64px; border-radius: 100px; background: #fff; color: var(--ink); font-weight: 600; font-size: 44px; }
+.cta .av { width: 64px; height: 64px; border-radius: 50%; background: var(--ink); display: flex; align-items: center; justify-content: center; }
+.cta .av img { width: 42px; }
+.url { margin-top: 40px; font-family: 'DM Serif Display', serif; font-size: 64px; color: #fff; letter-spacing: -1px; }
+.url span { color: #8a8a8a; }
+.legal { position: absolute; bottom: 80px; left: 70px; right: 70px; font-size: 22px; line-height: 1.5; color: #6a6a6a; text-align: center; }
+#mark { position: absolute; top: 80px; left: 50%; width: 108px; margin-left: -54px; }
+</style>
+</head>
+<body>
+<div id="stage">
+  <div class="halo" id="halo"></div>
+  <img id="mark" src="bird_ink.png" alt="">
+
+  <!-- 1. Hook -->
+  <section class="scene" id="s1">
+    <div class="el eyebrow" id="s1a">Crédito CLT</div>
+    <div class="el display" id="s1b" style="margin-top:60px">Já pediu<br>empréstimo e<br>só te mostraram<br><em>uma opção?</em></div>
+  </section>
+
+  <!-- 1b. Authority: as seen on TV -->
+  <section class="scene" id="sA">
+    <div class="el eyebrow" id="sAa">Como visto na TV</div>
+    <div class="el title" id="sAb" style="margin-top:46px;font-size:96px">A Phoenix Brasil<br>no <em>A Tarde é Sua</em></div>
+    <div class="el authority-sub" id="sAc">com <b>Sônia Abrão</b> · RedeTV!</div>
+    <div id="tv" class="el">
+      <div class="bezel"><div class="scr"><img id="tvimg" src="tv.png" alt="Phoenix Brasil no programa A Tarde é Sua"><div class="glare" id="glare"></div></div>
+        <div class="onair"><i id="onDot"></i>Na TV aberta</div></div>
+      <div class="stand"></div>
+    </div>
+    <div class="el seal" id="sAd"><svg viewBox="0 0 24 24"><path d="M12 3l8 3v6c0 4.5-3.4 8.2-8 9-4.6-.8-8-4.5-8-9V6l8-3z"/><path d="M8.5 12l2.5 2.5 4.5-5"/></svg>Empresa que você já viu na TV</div>
+  </section>
+
+  <!-- 2. Map -->
+  <section class="scene" id="s2" style="justify-content:flex-start;padding-top:250px">
+    <div class="el title" id="s2a">Atendemos o<br><em>Brasil todo.</em></div>
+    <svg id="map" class="el" viewBox="0 0 900 870"></svg>
+    <div class="el stat-line" id="s2b"><span class="v serifnum">+<span id="nCli">0</span></span><span class="l">clientes<br>atendidos</span></div>
+  </section>
+
+  <!-- 3. Banks -->
+  <section class="scene" id="s3">
+    <div class="el stat-line" id="s3a" style="margin-top:0"><span class="v serifnum" style="font-size:230px">+<span id="nBk">0</span></span><span class="l" style="font-size:48px">bancos<br>parceiros</span></div>
+    <div class="el lead" id="s3b" style="margin-top:20px">comparados <b style="color:var(--ink);font-weight:600">ao mesmo tempo</b>.</div>
+    <div class="banks">
+      <div class="bank el" id="b0"><img src="logos/0_BancoBMG.png" alt="Banco BMG"></div>
+      <div class="bank el" id="b1"><img src="logos/2_C6Bank.png" alt="C6 Bank"></div>
+      <div class="bank el" id="b2"><img src="logos/3_BancoMercantil.png" alt="Banco Mercantil"></div>
+      <div class="bank el" id="b3"><img src="logos/1_Facta.png" alt="Facta" style="max-height:92%"></div>
+      <div class="bank el" id="b4"><img src="logos/4_V8Digital.png" alt="V8 Digital" style="max-height:96%"></div>
+      <div class="bank el more" id="b5">+15<small>bancos</small></div>
+    </div>
+  </section>
+
+  <!-- 4. Nix chat -->
+  <section class="scene" id="s4" style="justify-content:flex-start;padding-top:150px">
+    <div class="el eyebrow" id="s4h">Conheça a Nix</div>
+    <div id="phone" class="el">
+      <div class="screen">
+        <div class="island"></div>
+        <div class="sbar"><span>03:12</span><span>●●● 100%</span></div>
+        <div class="chead">
+          <div class="avatar"><img src="bird_white.png" alt=""></div>
+          <div><div class="n">Nix</div><div class="s"><i></i>IA da Phoenix Brasil · online agora</div></div>
+        </div>
+        <div class="msgs" id="msgs">
+          <div class="msg me" id="m1">Oi! Quero simular o crédito CLT</div>
+          <div class="typing" id="ty1"><b></b><b></b><b></b></div>
+          <div class="msg nix" id="m2">Oi, eu sou a <b>Nix</b>! 👋 Já estou comparando <b>mais de 20 bancos</b> para você…</div>
+          <div class="scan" id="scan">
+            <div class="hd"><span id="scanTxt">Consultando bancos…</span><span id="scanN">0/20</span></div>
+            <div class="bar"><i id="scanBar"></i></div>
+            <div class="offer" id="o1"><span class="bk">Banco parceiro A</span><span class="vl">R$ 4.200 · 48x R$ 176,40</span></div>
+            <div class="offer" id="o2"><span class="bk">Banco parceiro B</span><span class="vl">R$ 4.650 · 48x R$ 189,10</span></div>
+            <div class="offer" id="o3"><span class="bk">Banco parceiro C<span class="badge">Melhor oferta</span></span><span class="vl">R$ 5.000 · 48x R$ 192,30</span></div>
+          </div>
+          <div class="typing" id="ty2"><b></b><b></b><b></b></div>
+          <div class="msg nix" id="m3">Encontrei! 🎉 <b>R$ 5.000</b> e você começa a pagar em <b>até 90 dias</b>. Vamos seguir?</div>
+        </div>
+        <div class="input" id="inp"><span id="inpTxt"></span><span class="caret" id="caret"></span></div>
+      </div>
+    </div>
+    <div class="illus el" id="s4n">Simulação ilustrativa. Valores sujeitos à análise de crédito.</div>
+  </section>
+
+  <!-- 5. 24h -->
+  <section class="scene" id="s5">
+    <div class="el display" id="s5a" style="font-size:190px">24h</div>
+    <div class="el title" id="s5b" style="font-size:96px;margin-top:10px"><em>por dia.</em></div>
+    <svg id="clock" class="el" viewBox="0 0 200 200">
+      <circle class="face" cx="100" cy="100" r="92"/>
+      <g id="ticks"></g>
+      <line class="hand" id="hH" x1="100" y1="100" x2="100" y2="58" stroke-width="7"/>
+      <line class="hand" id="hM" x1="100" y1="100" x2="100" y2="30" stroke-width="4.5"/>
+      <circle cx="100" cy="100" r="6" fill="#111"/>
+    </svg>
+    <div class="el lead" id="s5c" style="margin-top:70px">A Nix te atende <b style="color:var(--ink);font-weight:600">a hora que você quiser.</b></div>
+    <div class="el" id="s5d" style="margin-top:26px;font-size:28px;color:var(--muted)">Especialistas humanos em horário comercial.</div>
+  </section>
+
+  <!-- 6. Brand / CTA -->
+  <section class="scene" id="s6">
+    <img class="el" id="bird" src="bird_white.png" alt="Phoenix Brasil">
+    <div class="el wordmark" id="s6a">phoenix brasil</div>
+    <div class="el tagline" id="s6b">Soluções Financeiras</div>
+    <div class="el cta" id="s6c"><span class="av"><img src="bird_white.png" alt=""></span>Fale com a Nix agora</div>
+    <div class="el url" id="s6d">phoenixbrasil.com<span>/clt</span></div>
+    <div class="legal el" id="s6e">Correspondente bancário autorizado · Sujeito à análise de crédito.<br>Bancos parceiros conforme disponibilidade. Simulação ilustrativa.</div>
+  </section>
+</div>
+
+<script src="br_paths.js"></script>
+<script>
+const $ = id => document.getElementById(id);
+const clamp = (x, a = 0, b = 1) => Math.min(b, Math.max(a, x));
+const lerp = (a, b, t) => a + (b - a) * t;
+const easeOutExpo = t => t >= 1 ? 1 : 1 - Math.pow(2, -10 * t);
+const easeOutBack = t => { const c = 1.6; return 1 + (c + 1) * Math.pow(t - 1, 3) + c * Math.pow(t - 1, 2); };
+const easeInOutCubic = t => t < .5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
+const easeInCubic = t => t * t * t;
+const prog = (t, start, dur) => clamp((t - start) / dur);
+const mix = (c1, c2, k) => `rgb(${c1.map((v, i) => Math.round(lerp(v, c2[i], k))).join(',')})`;
+const NS = 'http://www.w3.org/2000/svg';
+
+// ---- Map build: light-up order spreads outward from MG (Phoenix's home, DDD 34)
+const map = $('map');
+const home = BR.states.find(s => s.s === 'MG').c;
+const states = BR.states.map(s => {
+  const p = document.createElementNS(NS, 'path'); p.setAttribute('d', s.d); map.appendChild(p);
+  return { ...s, el: p, dist: Math.hypot(s.c[0] - home[0], s.c[1] - home[1]) };
+});
+const maxDist = Math.max(...states.map(s => s.dist));
+const PAL = [[214, 229, 216], [237, 217, 210], [210, 220, 232], [237, 232, 214]];
+states.forEach((s, i) => {
+  s.col = PAL[i % 4];
+  const r = document.createElementNS(NS, 'circle'); r.setAttribute('class', 'ring'); r.setAttribute('cx', s.c[0]); r.setAttribute('cy', s.c[1]); map.appendChild(r); s.ring = r;
+  const d = document.createElementNS(NS, 'circle'); d.setAttribute('class', 'dot'); d.setAttribute('cx', s.c[0]); d.setAttribute('cy', s.c[1]); map.appendChild(d); s.dot = d;
+});
+
+// clock ticks
+for (let i = 0; i < 12; i++) {
+  const a = i * Math.PI / 6, l = document.createElementNS(NS, 'line');
+  l.setAttribute('class', 'tick');
+  l.setAttribute('x1', 100 + 78 * Math.sin(a)); l.setAttribute('y1', 100 - 78 * Math.cos(a));
+  l.setAttribute('x2', 100 + 86 * Math.sin(a)); l.setAttribute('y2', 100 - 86 * Math.cos(a));
+  $('ticks').appendChild(l);
+}
+
+function show(id, t, inAt, outAt, o = {}) {
+  const el = typeof id === 'string' ? $(id) : id;
+  const dIn = o.dIn ?? 1.0, dOut = o.dOut ?? 0.55;
+  const rise = o.rise ?? 60, blur = o.blur ?? 16, s0 = o.scale ?? 0.97;
+  const pi = easeOutExpo(prog(t, inAt, dIn));
+  const po = outAt == null ? 0 : easeInCubic(prog(t, outAt, dOut));
+  const y = (1 - pi) * rise - po * (o.riseOut ?? 40);
+  const sc = lerp(s0, 1, pi) * lerp(1, o.scaleOut ?? 1.03, po);
+  const bl = (1 - pi) * blur + po * blur;
+  el.style.opacity = pi * (1 - po);
+  el.style.transform = `translateY(${y}px) scale(${sc})`;
+  el.style.filter = bl > 0.05 ? `blur(${bl}px)` : 'none';
+}
+// chat bubble pop (no blur, slight spring) — collapses layout space until shown
+function bubble(id, t, inAt, outAt) {
+  const el = $(id);
+  const visible = t >= inAt && (outAt == null || t < outAt);
+  el.style.display = visible ? '' : 'none';
+  if (!visible) return;
+  const p = prog(t, inAt, 0.45);
+  el.style.opacity = clamp(p * 2);
+  el.style.transform = `translateY(${(1 - easeOutExpo(p)) * 30}px) scale(${lerp(0.9, 1, easeOutBack(p))})`;
+  el.style.transformOrigin = el.classList.contains('me') ? 'bottom right' : 'bottom left';
+}
+
+// counters (also used to generate tick sounds)
+const COUNTERS = [
+  { id: 'nCli', start: 6.6, dur: 2.6, max: 5000, fmt: v => v.toLocaleString('pt-BR') },
+  { id: 'nBk', start: 11.6, dur: 1.8, max: 20, fmt: v => String(v) },
+];
+const counterVal = (c, t) => Math.round(c.max * easeOutExpo(prog(t, c.start, c.dur)));
+
+const TYPE_TXT = 'Oi! Quero simular o crédito CLT';
+const TYPE_AT = 17.6, TYPE_CPS = 22;
+
+const SCENES = [['s1', 0, 4.6], ['s2', 4.6, 11.0], ['s3', 11.0, 16.2], ['s4', 16.2, 29.4], ['s5', 29.4, 33.6], ['s6', 33.6, 41]];
+const DURATION = 46;
+const BG = [248, 246, 242], DARK = [17, 17, 17];
+
+function renderBase(t) {
+  for (const [id, a, b] of SCENES) $(id).style.display = (t >= a - 0.01 && t < b + 0.7) ? 'flex' : 'none';
+
+  const dk = easeInOutCubic(prog(t, 33.3, 0.9));
+  $('stage').style.background = mix(BG, DARK, dk);
+  const halo = $('halo');
+  halo.style.opacity = (0.9 + 0.1 * Math.sin(t * 0.7)) * (1 - dk);
+  halo.style.transform = `translate(${40 * Math.sin(t * 0.3)}px, ${lerp(150, 520, easeInOutCubic(prog(t, 0, 33)))}px) scale(${1 + 0.05 * Math.sin(t * 0.5)})`;
+  $('mark').style.opacity = 0.9 * prog(t, 0.1, 0.8) * (1 - prog(t, 16.0, 0.3)) + 0.9 * prog(t, 29.5, 0.5) * (1 - prog(t, 33.0, 0.4));
+
+  // 1. Hook
+  show('s1a', t, 0.15, 4.0);
+  show('s1b', t, 0.45, 4.0, { rise: 90, blur: 22 });
+
+  // 2. Map
+  show('s2a', t, 4.8, 10.4);
+  show('map', t, 5.0, 10.4, { blur: 0, rise: 40, scale: 0.94 });
+  for (const s of states) {
+    const at = 5.6 + 1.9 * (s.dist / maxDist);
+    const k = easeOutExpo(prog(t, at, 0.7));
+    s.el.style.fill = mix([255, 255, 255], s.col, k);
+    s.el.style.stroke = mix([200, 195, 188], [255, 255, 255], k);
+    s.dot.setAttribute('r', 7 * easeOutBack(prog(t, at + 0.1, 0.5)));
+    const rp = ((t - at) % 1.8) / 1.8;
+    const on = t > at;
+    s.ring.setAttribute('r', on ? 7 + 26 * rp : 0);
+    s.ring.style.opacity = on ? 0.5 * (1 - rp) : 0;
+  }
+  show('s2b', t, 6.4, 10.4);
+  $('nCli').textContent = COUNTERS[0].fmt(counterVal(COUNTERS[0], t));
+
+  // 3. Banks
+  show('s3a', t, 11.2, 15.6, { scale: 0.88, blur: 26 });
+  $('nBk').textContent = counterVal(COUNTERS[1], t);
+  show('s3b', t, 11.8, 15.6);
+  for (let i = 0; i < 6; i++) show('b' + i, t, 12.3 + i * 0.22, 15.7, { rise: 120, blur: 10, scale: 0.85 });
+
+  // 4. Nix chat
+  show('s4h', t, 16.4, 28.8);
+  show('phone', t, 16.5, 28.8, { rise: 260, blur: 10, scale: 0.92 });
+  show('s4n', t, 17.0, 28.8, { blur: 0, rise: 0 });
+  // typing into the input, then send
+  const typed = Math.floor(clamp((t - TYPE_AT) * TYPE_CPS, 0, TYPE_TXT.length));
+  const sent = t >= 19.4;
+  $('inpTxt').textContent = sent ? '' : (typed ? [...TYPE_TXT].slice(0, typed).join('') : '');
+  $('inpTxt').className = '';
+  if (!sent && typed === 0) { $('inpTxt').textContent = 'Mensagem'; $('inpTxt').className = 'ph'; }
+  $('caret').style.opacity = (Math.floor(t * 2.2) % 2 === 0) ? 1 : 0;
+  bubble('m1', t, 19.4);
+  bubble('ty1', t, 19.9, 21.0);
+  for (let i = 0; i < 3; i++) $('ty1').children[i].style.transform = `translateY(${-8 * Math.max(0, Math.sin(t * 9 - i * 0.9))}px)`;
+  bubble('m2', t, 21.0);
+  bubble('scan', t, 21.8);
+  const sp = easeInOutCubic(prog(t, 22.0, 2.6));
+  $('scanBar').style.width = (sp * 100) + '%';
+  $('scanN').textContent = Math.round(sp * 20) + '/20';
+  $('scanTxt').textContent = sp < 1 ? 'Consultando bancos…' : 'Bancos consultados ✓';
+  bubble('o1', t, 22.9); bubble('o2', t, 23.6); bubble('o3', t, 24.4);
+  $('o3').classList.toggle('best', t >= 24.9);
+  $('o3').style.transform += ` scale(${1 + 0.04 * Math.sin(Math.PI * prog(t, 24.9, 0.5))})`;
+  bubble('ty2', t, 25.4, 26.4);
+  for (let i = 0; i < 3; i++) $('ty2').children[i].style.transform = `translateY(${-8 * Math.max(0, Math.sin(t * 9 - i * 0.9))}px)`;
+  bubble('m3', t, 26.4);
+
+  // 5. 24h clock: hands sweep a full day quickly
+  show('s5a', t, 29.6, 33.0, { scale: 0.85, blur: 28 });
+  show('s5b', t, 30.0, 33.0);
+  show('clock', t, 30.2, 33.0, { scale: 0.85 });
+  const day = easeInOutCubic(prog(t, 30.4, 2.4)) * 24 + 3.2;
+  $('hH').setAttribute('transform', `rotate(${day * 30} 100 100)`);
+  $('hM').setAttribute('transform', `rotate(${day * 360} 100 100)`);
+  show('s5c', t, 30.8, 33.0);
+  show('s5d', t, 31.3, 33.0, { blur: 0, rise: 20 });
+
+  // 6. Brand
+  const bi = easeOutExpo(prog(t, 33.8, 1.8));
+  const bird = $('bird');
+  bird.style.opacity = bi;
+  bird.style.filter = `blur(${(1 - bi) * 36}px)`;
+  bird.style.transform = `translateY(${(1 - bi) * 120}px) scale(${lerp(0.75, 1, bi) * (1 + 0.03 * prog(t, 35.4, 5.6))})`;
+  show('s6a', t, 34.6, null, { rise: 50 });
+  show('s6b', t, 35.1, null, { rise: 30 });
+  show('s6c', t, 36.0, null, { rise: 60, scale: 0.9 });
+  show('s6d', t, 36.6, null, { rise: 30 });
+  show('s6e', t, 37.2, null, { blur: 0, rise: 0 });
+}
+
+// Sound cue sheet, consumed by the audio mixer
+function cuesBase(fps = 60) {
+  const c = [];
+  const add = (t, type, gain = 1) => c.push({ t: +t.toFixed(3), type, gain });
+  [0.4, 4.7, 11.1, 16.4, 29.5].forEach(t => add(t, 'whoosh'));
+  for (const s of states) add(5.6 + 1.9 * (s.dist / maxDist) + 0.1, 'blip', 0.35);
+  for (const cnt of COUNTERS) {
+    let last = -1, lastT = -1;
+    for (let f = Math.floor(cnt.start * fps); f <= (cnt.start + cnt.dur) * fps; f++) {
+      const t = f / fps, v = counterVal(cnt, t);
+      if (v !== last && t - lastT >= 0.045) { add(t, 'tick', 0.5); last = v; lastT = t; }
+    }
+  }
+  for (let i = 0; i < 6; i++) add(12.3 + i * 0.22, 'pop', 0.55);
+  for (let i = 0; i < [...TYPE_TXT].length; i++) add(TYPE_AT + i / TYPE_CPS, 'key', 0.45);
+  add(19.4, 'send');
+  [21.0, 26.4].forEach(t => add(t, 'plim'));
+  [22.9, 23.6, 24.4].forEach(t => add(t, 'pop', 0.5));
+  add(24.9, 'ding');
+  // one tick per hour the clock hand passes
+  let lastH = -1;
+  for (let f = Math.floor(30.4 * fps); f <= 32.8 * fps; f++) {
+    const h = Math.floor(easeInOutCubic(prog(f / fps, 30.4, 2.4)) * 24);
+    if (h !== lastH) { add(f / fps, 'tick', 0.3); lastH = h; }
+  }
+  add(33.5, 'riser'); add(33.9, 'boom');
+  add(36.0, 'pop', 0.6);
+  return c.sort((a, b) => a.t - b.t);
+}
+
+
+// Authority scene inserted after the hook; the rest of the timeline is shifted by AUTH_LEN
+const AUTH_AT = 4.6, AUTH_LEN = 5.4;
+function render(t) {
+  const tb = t < AUTH_AT ? t : Math.max(AUTH_AT, t - AUTH_LEN);
+  renderBase(tb);
+  const on = t >= AUTH_AT - 0.01 && t < AUTH_AT + AUTH_LEN + 0.7;
+  $('sA').style.display = on ? 'flex' : 'none';
+  if (t >= AUTH_AT && t < AUTH_AT + AUTH_LEN) $('s2').style.display = 'none';
+  if (!on) return;
+  const a = AUTH_AT, out = AUTH_AT + AUTH_LEN - 0.6;
+  show('sAa', t, a + 0.15, out);
+  show('sAb', t, a + 0.35, out, { rise: 80 });
+  show('sAc', t, a + 0.8, out);
+  show('tv', t, a + 1.0, out, { rise: 200, blur: 12, scale: 0.9 });
+  $('tvimg').style.transform = `scale(${1.0 + 0.06 * prog(t, a + 1.0, AUTH_LEN)})`;
+  $('glare').style.left = `${lerp(-40, 120, easeInOutCubic(prog(t, a + 1.6, 1.1)))}%`;
+  $('onDot').style.opacity = 0.35 + 0.65 * (0.5 + 0.5 * Math.sin(t * 6));
+  show('sAd', t, a + 2.4, out, { rise: 40, scale: 0.9 });
+  $('mark').style.opacity = 0.9;
+}
+function cues(fps = 60) {
+  const shifted = cuesBase(fps).map(c => c.t >= AUTH_AT ? { ...c, t: +(c.t + AUTH_LEN).toFixed(3) } : c);
+  const a = AUTH_AT;
+  shifted.push({ t: a + 0.1, type: 'whoosh', gain: 1 }, { t: a + 1.0, type: 'swell', gain: 1 },
+    { t: a + 1.6, type: 'shimmer', gain: 1 }, { t: a + 2.4, type: 'ding', gain: 0.8 });
+  return shifted.sort((x, y) => x.t - y.t);
+}
+
+window.DURATION = DURATION;
+window.render = render;
+window.cues = cues;
+render(Number(new URLSearchParams(location.search).get('t') || 0));
+</script>
+</body>
+</html>

@@ -48,7 +48,7 @@ def whoosh(dur=0.9):
 def tick():
     n = int(0.03 * SR)
     f = 2300 * (1 + 0.04 * rng.standard_normal())
-    return 0.5 * sine(f, n) * env(n, 0.0005, 0.006)
+    return 0.8 * sine(f, n) * env(n, 0.0005, 0.008)
 
 
 def blip():
@@ -59,14 +59,14 @@ def blip():
 def pop():
     n = int(0.12 * SR)
     f = np.linspace(720, 320, n)
-    return 0.6 * sine(f, n) * env(n, 0.001, 0.035)
+    return 0.8 * sine(f, n) * env(n, 0.001, 0.05)
 
 
 def key():
     n = int(0.025 * SR)
     x = rng.standard_normal(n)
     x = x - onepole_lp(x, 2500)
-    return 0.25 * x * env(n, 0.0003, 0.005)
+    return 0.45 * x * env(n, 0.0003, 0.007)
 
 
 def send():
@@ -111,9 +111,35 @@ def boom():
     return 0.9 * (sub + body + air)
 
 
+def swell(dur=1.2):
+    """Soft rising pad under the TV reveal."""
+    n = int(dur * SR)
+    t = np.arange(n) / n
+    y = sum(sine(f, n) for f in (220, 277.2, 329.6, 440))
+    return 0.18 * y * np.sin(np.pi * t) ** 2
+
+
+def shimmer():
+    """Bright sparkle for the screen glare."""
+    n = int(0.9 * SR)
+    out = np.zeros(n)
+    for i, f in enumerate((2093, 2637, 3136, 4186)):
+        s = int(i * 0.06 * SR)
+        out[s:] += 0.22 * sine(f, n - s) * env(n - s, 0.002, 0.18)
+    return out
+
+
+def thump():
+    """Low body layered under pops and whooshes so they read on phone speakers."""
+    n = int(0.25 * SR)
+    f = np.linspace(160, 70, n)
+    return 0.5 * sine(f, n) * env(n, 0.002, 0.06)
+
+
 SOUNDS = {'whoosh': whoosh, 'tick': tick, 'blip': blip, 'pop': pop, 'key': key, 'send': send,
-          'plim': plim, 'ding': ding, 'riser': riser, 'boom': boom}
-CACHE_OK = {'whoosh', 'plim', 'ding', 'boom', 'send', 'blip', 'pop'}
+          'plim': plim, 'ding': ding, 'riser': riser, 'boom': boom,
+          'swell': swell, 'shimmer': shimmer, 'thump': thump}
+CACHE_OK = {'whoosh', 'plim', 'ding', 'boom', 'send', 'blip', 'pop', 'swell', 'shimmer', 'thump'}
 
 
 def reverb(x, seconds=1.1, mix=0.18):
@@ -132,7 +158,9 @@ def main(cue_path, out_path):
     L = np.zeros(total)
     R = np.zeros(total)
     cache = {}
-    for c in data['cues']:
+    extra = [{'t': c['t'] + (0.25 if c['type'] == 'whoosh' else 0), 'type': 'thump', 'gain': 0.6 if c['type'] == 'whoosh' else 0.35}
+             for c in data['cues'] if c['type'] in ('whoosh', 'pop')]
+    for c in data['cues'] + extra:
         kind = c['type']
         if kind in CACHE_OK:
             s = cache.setdefault(kind, SOUNDS[kind]())
