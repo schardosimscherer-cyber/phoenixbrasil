@@ -1,0 +1,258 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<style>
+@font-face { font-family: Poppins; font-weight: 400; src: url(Poppins-400.ttf); }
+@font-face { font-family: Poppins; font-weight: 600; src: url(Poppins-600.ttf); }
+@font-face { font-family: Poppins; font-weight: 700; src: url(Poppins-700.ttf); }
+@font-face { font-family: 'DM Serif Display'; font-weight: 400; src: url(DMSerifDisplay-400.ttf); }
+
+/* Phoenix Brasil brand tokens (from phoenixbrasil.com) */
+:root {
+  --bg: #F8F6F2; --bg-alt: #F0EDE8; --white: #FFFFFF; --ink: #111111; --ink-soft: #555555; --muted: #888888;
+  --sage: #D6E5D8; --blush: #EDD9D2; --slate: #D2DCE8; --warm: #EDE8D6;
+  --border: #E2DDD8; --border-dark: #C8C3BC; --num: #C8C3BC; --dark: #111111; --wa: #25D366;
+}
+* { margin: 0; padding: 0; box-sizing: border-box; }
+html, body { width: 1080px; height: 1920px; overflow: hidden; background: var(--bg); }
+#stage { position: relative; width: 1080px; height: 1920px; overflow: hidden; background: var(--bg);
+  font-family: Poppins, sans-serif; color: var(--ink); -webkit-font-smoothing: antialiased; }
+
+.halo { position: absolute; width: 1300px; height: 1300px; left: -110px; border-radius: 50%; filter: blur(60px);
+  background: radial-gradient(circle, rgba(214,229,216,0.95) 0%, rgba(214,229,216,0.35) 40%, transparent 68%); }
+
+.scene { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; padding: 0 84px; }
+.el { will-change: transform, opacity, filter; }
+
+.eyebrow { font-weight: 600; font-size: 30px; letter-spacing: 9px; text-transform: uppercase; color: var(--muted); padding-left: 9px; }
+.serif { font-family: 'DM Serif Display', serif; font-weight: 400; }
+.display { font-family: 'DM Serif Display', serif; font-size: 150px; line-height: 1.04; letter-spacing: -3px; }
+.title { font-family: 'DM Serif Display', serif; font-size: 108px; line-height: 1.08; letter-spacing: -2px; }
+.title em, .display em { font-style: italic; color: var(--ink-soft); }
+.lead { font-size: 44px; line-height: 1.5; color: var(--ink-soft); }
+
+/* Big counter */
+.big { font-family: 'DM Serif Display', serif; font-size: 400px; line-height: 0.9; letter-spacing: -10px; font-variant-numeric: tabular-nums; }
+.big .unit { font-size: 190px; letter-spacing: -4px; color: var(--ink-soft); }
+
+/* Pills (site tag style) */
+.pill { display: inline-block; padding: 18px 40px; border-radius: 100px; background: rgba(17,17,17,0.08); font-weight: 600; font-size: 32px; }
+.pill.dark { background: var(--ink); color: #fff; }
+
+/* Calendar strip */
+.cal { display: grid; grid-template-columns: repeat(10, 64px); gap: 14px; margin-top: 70px; }
+.day { width: 64px; height: 64px; border-radius: 18px; background: var(--white); border: 1.5px solid var(--border); }
+.day.on { background: var(--blush); border-color: #DDBFB4; }
+
+/* Compare cards (site "Quem atendemos" cards) */
+.cmp { width: 912px; border-radius: 44px; padding: 56px 60px; text-align: left; position: relative; margin: 18px 0; }
+.cmp.a { background: var(--white); border: 1.5px solid var(--border); }
+.cmp.b { background: var(--blush); }
+.cmp h3 { font-family: 'DM Serif Display', serif; font-weight: 400; font-size: 64px; letter-spacing: -1px; }
+.cmp .idx { position: absolute; top: 34px; right: 52px; font-family: 'DM Serif Display', serif; font-size: 130px; color: rgba(17,17,17,0.08); line-height: 1; }
+.row { display: flex; align-items: center; gap: 24px; font-size: 38px; margin-top: 26px; }
+.row b { font-weight: 600; }
+.mk { flex: 0 0 52px; height: 52px; border-radius: 50%; display: flex; align-items: center; justify-content: center; }
+.mk svg { width: 28px; height: 28px; fill: none; stroke-width: 3.2; stroke-linecap: round; stroke-linejoin: round; }
+.mk.x { background: rgba(17,17,17,0.08); } .mk.x svg { stroke: var(--ink-soft); }
+.mk.ok { background: var(--ink); } .mk.ok svg { stroke: #fff; }
+.cmp.a .row { color: var(--ink-soft); }
+
+/* Stats (hero stats) */
+.stats { display: flex; flex-direction: column; width: 860px; margin-top: 80px; border-top: 1.5px solid var(--border); }
+.stat { display: flex; align-items: baseline; justify-content: space-between; padding: 48px 10px; border-bottom: 1.5px solid var(--border); }
+.stat .v { font-family: 'DM Serif Display', serif; font-size: 150px; line-height: 1; letter-spacing: -3px; }
+.stat .l { font-size: 38px; color: var(--muted); }
+
+/* Final (site dark CTA section) */
+#bird { width: 360px; height: auto; }
+.wordmark { font-family: 'DM Serif Display', serif; font-size: 112px; letter-spacing: -2px; line-height: 1; margin-top: 54px; color: #fff; }
+.tagline { font-size: 26px; letter-spacing: 13px; text-transform: uppercase; color: #8a8a8a; margin-top: 22px; padding-left: 13px; font-weight: 600; }
+.cta { margin-top: 100px; display: inline-flex; align-items: center; gap: 22px; padding: 36px 64px; border-radius: 100px;
+  background: #fff; color: var(--ink); font-weight: 600; font-size: 42px; }
+.cta svg { width: 50px; height: 50px; }
+.phone { margin-top: 36px; font-size: 36px; color: #9a9a9a; }
+.legal { position: absolute; bottom: 80px; left: 70px; right: 70px; font-size: 22px; line-height: 1.5; color: #6a6a6a; text-align: center; }
+#mark { position: absolute; top: 92px; left: 50%; width: 70px; margin-left: -35px; }
+</style>
+</head>
+<body>
+<div id="stage">
+  <div class="halo" id="halo"></div>
+  <img id="mark" src="bird_ink.png" alt="">
+
+  <!-- 1. Hook -->
+  <section class="scene" id="s1">
+    <div class="el eyebrow" id="s1a">Trabalhador CLT</div>
+    <div class="el display" id="s1b" style="margin-top:60px">Precisa de<br>dinheiro <em>agora?</em></div>
+    <div class="el lead" id="s1c" style="margin-top:70px">Cuidado com <b style="color:var(--ink);font-weight:600">onde</b> você pega.</div>
+  </section>
+
+  <!-- 2. 17% -->
+  <section class="scene" id="s2">
+    <div class="el lead" id="s2a">Empréstimo pessoal<br><b style="color:var(--ink);font-weight:600">sem garantia</b> pode chegar a</div>
+    <div class="el big" id="s2num" style="margin-top:50px"><span id="n17">0</span><span class="unit">%</span></div>
+    <div class="el title" id="s2b" style="font-size:96px;margin-top:6px"><em>ao mês.</em></div>
+    <div class="el pill" id="s2c" style="margin-top:80px">E a 1ª parcela já vence no mês seguinte.</div>
+  </section>
+
+  <!-- 3. 90 days -->
+  <section class="scene" id="s3">
+    <div class="el eyebrow" id="s3a">Crédito do Trabalhador</div>
+    <div class="el title" id="s3b" style="margin-top:56px">Comece a pagar<br>só depois de</div>
+    <div class="el big" id="s3num" style="margin-top:30px"><span id="n90">0</span></div>
+    <div class="el title" id="s3c" style="font-size:96px"><em>dias.</em></div>
+    <div class="cal el" id="cal"></div>
+  </section>
+
+  <!-- 4. Compare -->
+  <section class="scene" id="s4">
+    <div class="el eyebrow" id="s4h" style="margin-bottom:40px">Compare</div>
+    <div class="el cmp a" id="ca">
+      <div class="idx">01</div>
+      <h3>Empréstimo pessoal</h3>
+      <div class="row"><span class="mk x"><svg viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></svg></span><span>Juros de até <b>17% a.m.</b></span></div>
+      <div class="row"><span class="mk x"><svg viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></svg></span><span>Paga já no mês seguinte</span></div>
+      <div class="row"><span class="mk x"><svg viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></svg></span><span>Boleto todo mês</span></div>
+    </div>
+    <div class="el cmp b" id="cb">
+      <div class="idx">02</div>
+      <h3>Consignado CLT</h3>
+      <div class="row"><span class="mk ok"><svg viewBox="0 0 24 24"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg></span><span>Juros <b>bem menores</b></span></div>
+      <div class="row"><span class="mk ok"><svg viewBox="0 0 24 24"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg></span><span>Até <b>90 dias</b> para a 1ª parcela</span></div>
+      <div class="row"><span class="mk ok"><svg viewBox="0 0 24 24"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg></span><span>Desconto direto na folha</span></div>
+    </div>
+  </section>
+
+  <!-- 5. Phoenix proof -->
+  <section class="scene" id="s5">
+    <div class="el title" id="s5a">Simples, rápido<br><em>e sem sair de casa.</em></div>
+    <div class="stats">
+      <div class="el stat" id="st1"><span class="v">R$0</span><span class="l">Taxa de consulta</span></div>
+      <div class="el stat" id="st2"><span class="v"><span id="n24">0</span>h</span><span class="l">Análise rápida</span></div>
+      <div class="el stat" id="st3"><span class="v"><span id="n100">0</span>%</span><span class="l">Digital e seguro</span></div>
+    </div>
+  </section>
+
+  <!-- 6. Brand / CTA -->
+  <section class="scene" id="s6">
+    <img class="el" id="bird" src="bird_white.png" alt="Phoenix Brasil">
+    <div class="el wordmark" id="s6a">phoenix brasil</div>
+    <div class="el tagline" id="s6b">Soluções Financeiras</div>
+    <div class="el cta" id="s6c">
+      <svg viewBox="0 0 32 32"><path fill="#25D366" d="M16 3C8.8 3 3 8.7 3 15.8c0 2.5.7 4.9 2 6.9L3 29l6.5-2c1.9 1 4.1 1.6 6.5 1.6 7.2 0 13-5.7 13-12.8S23.2 3 16 3z"/><path fill="#fff" d="M22.6 18.9c-.4-.2-2.1-1-2.4-1.1-.3-.1-.6-.2-.8.2-.2.4-.9 1.1-1.1 1.3-.2.2-.4.3-.8.1-.4-.2-1.5-.6-2.9-1.8-1.1-1-1.8-2.1-2-2.5-.2-.4 0-.6.2-.8l.6-.7c.2-.2.3-.4.4-.6.1-.3.1-.5 0-.7-.1-.2-.8-1.9-1.1-2.6-.3-.7-.6-.6-.8-.6h-.7c-.2 0-.6.1-1 .5-.3.4-1.3 1.3-1.3 3.1s1.3 3.6 1.5 3.9c.2.2 2.6 4 6.4 5.5 3.8 1.5 3.8 1 4.5.9.7-.1 2.1-.9 2.4-1.7.3-.8.3-1.5.2-1.7-.1-.1-.3-.2-.7-.4z"/></svg>
+      Falar agora no WhatsApp
+    </div>
+    <div class="el phone" id="s6d">phoenixbrasil.com · (34) 99689-9148</div>
+    <div class="legal el" id="s6e">Correspondente bancário autorizado · Sujeito à análise de crédito.<br>Carência de até 90 dias conforme a instituição. Taxas de mercado variam por instituição.</div>
+  </section>
+</div>
+
+<script>
+const $ = id => document.getElementById(id);
+const clamp = (x, a = 0, b = 1) => Math.min(b, Math.max(a, x));
+const lerp = (a, b, t) => a + (b - a) * t;
+const easeOutExpo = t => t >= 1 ? 1 : 1 - Math.pow(2, -10 * t);
+const easeInOutCubic = t => t < .5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
+const easeInCubic = t => t * t * t;
+const prog = (t, start, dur) => clamp((t - start) / dur);
+const mix = (c1, c2, k) => `rgb(${c1.map((v, i) => Math.round(lerp(v, c2[i], k))).join(',')})`;
+
+// calendar strip: 30 days, filled progressively up to 90 days (3 rows feel)
+const cal = $('cal');
+for (let i = 0; i < 30; i++) { const d = document.createElement('div'); d.className = 'day'; cal.appendChild(d); }
+
+// Apple-style blur-rise entrance and blur-lift exit
+function show(id, t, inAt, outAt, o = {}) {
+  const el = typeof id === 'string' ? $(id) : id;
+  const dIn = o.dIn ?? 1.0, dOut = o.dOut ?? 0.55;
+  const rise = o.rise ?? 60, blur = o.blur ?? 16, s0 = o.scale ?? 0.97;
+  const pi = easeOutExpo(prog(t, inAt, dIn));
+  const po = outAt == null ? 0 : easeInCubic(prog(t, outAt, dOut));
+  const y = (1 - pi) * rise - po * (o.riseOut ?? 40);
+  const sc = lerp(s0, 1, pi) * lerp(1, o.scaleOut ?? 1.03, po);
+  const bl = (1 - pi) * blur + po * blur;
+  el.style.opacity = pi * (1 - po);
+  el.style.transform = `translateY(${y}px) scale(${sc})`;
+  el.style.filter = bl > 0.05 ? `blur(${bl}px)` : 'none';
+}
+
+const SCENES = [['s1', 0, 4.4], ['s2', 4.4, 10.2], ['s3', 10.2, 16.0], ['s4', 16.0, 22.4], ['s5', 22.4, 27.0], ['s6', 27.0, 34]];
+const DURATION = 34;
+const BG = [248, 246, 242], DARK = [17, 17, 17];
+
+function render(t) {
+  for (const [id, a, b] of SCENES) $(id).style.display = (t >= a - 0.01 && t < b + 0.7) ? 'flex' : 'none';
+
+  // background: cream → dark for the final brand scene (like the site's CTA band)
+  const dk = easeInOutCubic(prog(t, 26.7, 0.9));
+  $('stage').style.background = mix(BG, DARK, dk);
+
+  // soft sage halo, like the hero glow, drifting slowly
+  const halo = $('halo');
+  halo.style.opacity = (0.9 + 0.1 * Math.sin(t * 0.7)) * (1 - dk);
+  halo.style.transform = `translate(${40 * Math.sin(t * 0.3)}px, ${lerp(150, 520, easeInOutCubic(prog(t, 0, 27)))}px) scale(${1 + 0.05 * Math.sin(t * 0.5)})`;
+
+  // small ink phoenix on the light scenes
+  $('mark').style.opacity = 0.9 * prog(t, 0.1, 0.8) * (1 - prog(t, 26.4, 0.4));
+
+  // 1. Hook
+  show('s1a', t, 0.15, 3.8);
+  show('s1b', t, 0.45, 3.8, { rise: 90, blur: 22 });
+  show('s1c', t, 1.9, 3.9);
+
+  // 2. 17% a.m. counter
+  show('s2a', t, 4.6, 9.6);
+  show('s2num', t, 5.1, 9.6, { scale: 0.86, blur: 30 });
+  const k17 = easeOutExpo(prog(t, 5.2, 2.3));
+  $('n17').textContent = Math.round(17 * k17);
+  show('s2b', t, 6.6, 9.6);
+  show('s2c', t, 7.6, 9.7, { rise: 40 });
+
+  // 3. 90 days counter + calendar filling
+  show('s3a', t, 10.4, 15.4);
+  show('s3b', t, 10.7, 15.4, { rise: 80 });
+  show('s3num', t, 11.4, 15.5, { scale: 0.86, blur: 30 });
+  const k90 = easeOutExpo(prog(t, 11.5, 2.6));
+  $('n90').textContent = Math.round(90 * k90);
+  show('s3c', t, 12.6, 15.5);
+  show('cal', t, 11.6, 15.6, { blur: 0, rise: 30 });
+  const lit = Math.round(30 * k90);
+  [...cal.children].forEach((d, i) => d.classList.toggle('on', i < lit));
+
+  // 4. Compare
+  show('s4h', t, 16.2, 21.8);
+  show('ca', t, 16.5, 21.8, { rise: 110 });
+  show('cb', t, 18.2, 21.9, { rise: 110, scale: 0.94 });
+  // emphasis pulse on the CLT card
+  const pulse = Math.sin(Math.PI * prog(t, 19.6, 0.7));
+  $('cb').style.transform += ` scale(${1 + 0.025 * pulse})`;
+
+  // 5. Proof stats
+  show('s5a', t, 22.6, 26.3, { rise: 70 });
+  show('st1', t, 23.3, 26.3, { rise: 50 });
+  show('st2', t, 23.7, 26.35, { rise: 50 });
+  show('st3', t, 24.1, 26.4, { rise: 50 });
+  $('n24').textContent = Math.round(24 * easeOutExpo(prog(t, 23.7, 1.6)));
+  $('n100').textContent = Math.round(100 * easeOutExpo(prog(t, 24.1, 1.6)));
+
+  // 6. Brand: phoenix rises out of blur
+  const bi = easeOutExpo(prog(t, 27.2, 1.8));
+  const bird = $('bird');
+  bird.style.opacity = bi;
+  bird.style.filter = `blur(${(1 - bi) * 36}px)`;
+  bird.style.transform = `translateY(${(1 - bi) * 120}px) scale(${lerp(0.75, 1, bi) * (1 + 0.03 * prog(t, 28.8, 5))})`;
+  show('s6a', t, 28.1, null, { rise: 50 });
+  show('s6b', t, 28.6, null, { rise: 30 });
+  show('s6c', t, 29.5, null, { rise: 60, scale: 0.9 });
+  show('s6d', t, 30.0, null, { rise: 30 });
+  show('s6e', t, 30.4, null, { blur: 0, rise: 0 });
+}
+
+window.DURATION = DURATION;
+window.render = render;
+render(Number(new URLSearchParams(location.search).get('t') || 0));
+</script>
+</body>
+</html>
