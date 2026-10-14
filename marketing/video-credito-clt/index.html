@@ -1,0 +1,238 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<style>
+@font-face { font-family: Poppins; font-weight: 400; src: url(Poppins-400.ttf); }
+@font-face { font-family: Poppins; font-weight: 600; src: url(Poppins-600.ttf); }
+@font-face { font-family: Poppins; font-weight: 700; src: url(Poppins-700.ttf); }
+@font-face { font-family: 'DM Serif Display'; font-weight: 400; src: url(DMSerifDisplay-400.ttf); }
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+html, body { width: 1080px; height: 1920px; background: #000; overflow: hidden; }
+#stage { position: relative; width: 1080px; height: 1920px; overflow: hidden; background: #000;
+  font-family: Poppins, sans-serif; color: #F5F5F7; -webkit-font-smoothing: antialiased; }
+
+.glow { position: absolute; border-radius: 50%; filter: blur(120px); pointer-events: none; }
+#glowA { width: 1100px; height: 1100px; background: radial-gradient(circle, #FF7A1A 0%, #C2410C 45%, transparent 70%); }
+#glowB { width: 900px; height: 900px; background: radial-gradient(circle, #FFC857 0%, #E8590C 50%, transparent 70%); }
+
+.scene { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; padding: 0 90px; }
+.el { will-change: transform, opacity, filter; }
+
+.eyebrow { font-weight: 600; font-size: 34px; letter-spacing: 0.32em; text-transform: uppercase; color: #A1A1A6; }
+.h1 { font-weight: 600; font-size: 104px; line-height: 1.04; letter-spacing: -0.035em; }
+.h2 { font-weight: 600; font-size: 76px; line-height: 1.08; letter-spacing: -0.03em; }
+.serif { font-family: 'DM Serif Display', serif; font-weight: 400; letter-spacing: -0.01em; }
+.muted { color: #86868B; }
+.fire { background: linear-gradient(100deg, #FFD27A 0%, #FF9A3D 40%, #FF5A1F 75%, #E0301E 100%);
+  -webkit-background-clip: text; background-clip: text; color: transparent; }
+.red { background: linear-gradient(180deg, #FF6B5E, #D7261E); -webkit-background-clip: text; background-clip: text; color: transparent; }
+
+/* Scene 2 counter */
+#counter { font-weight: 700; font-size: 380px; line-height: 0.9; letter-spacing: -0.06em; font-variant-numeric: tabular-nums; }
+#counter .pct { font-size: 200px; letter-spacing: -0.04em; }
+
+/* Scene 4 cards */
+.card { width: 900px; display: flex; align-items: center; gap: 44px; padding: 52px 56px; margin: 18px 0;
+  border-radius: 48px; background: linear-gradient(180deg, rgba(255,255,255,0.09), rgba(255,255,255,0.04));
+  border: 1.5px solid rgba(255,255,255,0.12); text-align: left; }
+.icon { flex: 0 0 116px; height: 116px; border-radius: 32px; display: flex; align-items: center; justify-content: center;
+  background: linear-gradient(140deg, #FFB347, #FF5A1F); }
+.icon svg { width: 62px; height: 62px; stroke: #1a0a00; fill: none; stroke-width: 2.4; stroke-linecap: round; stroke-linejoin: round; }
+.card .t { font-weight: 600; font-size: 46px; line-height: 1.15; letter-spacing: -0.02em; }
+.card .s { font-size: 30px; color: #A1A1A6; margin-top: 8px; letter-spacing: -0.005em; }
+
+/* Scene 5 bars */
+.bars { display: flex; align-items: flex-end; justify-content: center; gap: 120px; height: 820px; margin-top: 70px; }
+.barwrap { display: flex; flex-direction: column; align-items: center; justify-content: flex-end; height: 100%; }
+.bar { width: 230px; border-radius: 36px 36px 14px 14px; transform-origin: bottom; }
+#barA { height: 760px; background: linear-gradient(180deg, #FF6B5E, #7A1410); }
+#barB { height: 250px; background: linear-gradient(180deg, #FFD27A, #E8590C); }
+.barlabel { margin-top: 32px; font-weight: 600; font-size: 38px; letter-spacing: -0.02em; }
+.barsub { font-size: 28px; color: #86868B; margin-top: 4px; }
+.note { position: absolute; bottom: 140px; left: 0; right: 0; font-size: 24px; color: #6E6E73; letter-spacing: 0.02em; }
+
+/* Scene 6 brand */
+#bird { width: 520px; height: auto; }
+.wordmark { font-family: 'DM Serif Display', serif; font-size: 116px; letter-spacing: -0.02em; line-height: 1; margin-top: 64px; }
+.tagline { font-size: 30px; letter-spacing: 0.5em; text-transform: uppercase; color: #A1A1A6; margin-top: 26px; padding-left: 0.5em; }
+.cta { margin-top: 110px; display: inline-flex; align-items: center; gap: 22px; padding: 34px 60px; border-radius: 999px;
+  background: #F5F5F7; color: #000; font-weight: 600; font-size: 42px; letter-spacing: -0.02em; }
+.cta svg { width: 46px; height: 46px; }
+.phone { margin-top: 34px; font-size: 40px; font-weight: 600; letter-spacing: 0.01em; color: #F5F5F7; }
+.legal { position: absolute; bottom: 90px; left: 80px; right: 80px; font-size: 22px; line-height: 1.4; color: #6E6E73; text-align: center; }
+
+/* small persistent bird watermark */
+#mark { position: absolute; top: 96px; left: 50%; width: 76px; margin-left: -38px; opacity: 0.0; }
+</style>
+</head>
+<body>
+<div id="stage">
+  <div class="glow" id="glowA"></div>
+  <div class="glow" id="glowB"></div>
+  <img id="mark" src="bird_white.png" alt="">
+
+  <!-- 1. Hook -->
+  <section class="scene" id="s1">
+    <div class="el eyebrow" id="s1a">Trabalhador CLT</div>
+    <div class="el h1" id="s1b" style="margin-top:56px">Tem carteira<br>assinada?</div>
+    <div class="el h2 muted" id="s1c" style="margin-top:64px">E ainda paga juros<br>de <span style="color:#F5F5F7">cartão de crédito</span>?</div>
+  </section>
+
+  <!-- 2. Counter -->
+  <section class="scene" id="s2">
+    <div class="el h2 muted" id="s2a">Os juros do<br>cartão rotativo podem<br>passar de</div>
+    <div class="el red" id="counter" style="margin-top:50px"><span id="num">0</span><span class="pct">%</span></div>
+    <div class="el h2" id="s2b" style="margin-top:20px">ao mês.</div>
+  </section>
+
+  <!-- 3. Reveal -->
+  <section class="scene" id="s3">
+    <div class="el h2 muted" id="s3a">Existe um caminho<br>mais inteligente.</div>
+    <div class="el serif fire" id="s3b" style="font-size:150px; line-height:1.0; margin-top:90px">Crédito do<br>Trabalhador</div>
+    <div class="el" id="s3c" style="font-size:40px; color:#A1A1A6; margin-top:56px; line-height:1.35">O consignado para quem<br>tem carteira assinada.</div>
+  </section>
+
+  <!-- 4. Benefits -->
+  <section class="scene" id="s4">
+    <div class="el eyebrow" id="s4h" style="margin-bottom:50px">Como funciona</div>
+    <div class="el card" id="c1">
+      <div class="icon"><svg viewBox="0 0 24 24"><rect x="3" y="6" width="18" height="13" rx="2.5"/><path d="M3 10h18M7 15h4"/></svg></div>
+      <div><div class="t">Parcela descontada<br>direto no salário</div><div class="s">Sem boleto para lembrar.</div></div>
+    </div>
+    <div class="el card" id="c2">
+      <div class="icon"><svg viewBox="0 0 24 24"><path d="M4 7l6 6 4-4 6 6"/><path d="M15 15h5v-5"/></svg></div>
+      <div><div class="t">Juros menores que<br>os do cartão</div><div class="s">Mais fôlego no orçamento.</div></div>
+    </div>
+    <div class="el card" id="c3">
+      <div class="icon"><svg viewBox="0 0 24 24"><path d="M12 3l8 3v6c0 4.5-3.4 8.2-8 9-4.6-.8-8-4.5-8-9V6l8-3z"/><path d="M8.5 12l2.5 2.5 4.5-5"/></svg></div>
+      <div><div class="t">FGTS pode servir<br>como garantia</div><div class="s">Conforme as regras do programa.</div></div>
+    </div>
+  </section>
+
+  <!-- 5. Compare -->
+  <section class="scene" id="s5">
+    <div class="el h2" id="s5a">Nem toda oferta<br>é igual.</div>
+    <div class="bars">
+      <div class="barwrap el" id="bwA"><div class="bar" id="barA"></div><div class="barlabel">Cartão rotativo</div><div class="barsub">custo mensal</div></div>
+      <div class="barwrap el" id="bwB"><div class="bar" id="barB"></div><div class="barlabel fire">Consignado CLT</div><div class="barsub">custo mensal</div></div>
+    </div>
+    <div class="el h2" id="s5b" style="margin-top:90px; font-size:62px">Comparar faz diferença<br><span class="fire">no seu bolso.</span></div>
+    <div class="note el" id="s5n">Ilustração comparativa. Taxas sujeitas a análise de crédito.</div>
+  </section>
+
+  <!-- 6. Brand -->
+  <section class="scene" id="s6">
+    <img class="el" id="bird" src="bird_white.png" alt="Phoenix Brasil">
+    <div class="el wordmark" id="s6a">phoenix brasil</div>
+    <div class="el tagline" id="s6b">Soluções Financeiras</div>
+    <div class="el cta" id="s6c">
+      <svg viewBox="0 0 32 32"><path fill="#25D366" d="M16 3C8.8 3 3 8.7 3 15.8c0 2.5.7 4.9 2 6.9L3 29l6.5-2c1.9 1 4.1 1.6 6.5 1.6 7.2 0 13-5.7 13-12.8S23.2 3 16 3z"/><path fill="#fff" d="M22.6 18.9c-.4-.2-2.1-1-2.4-1.1-.3-.1-.6-.2-.8.2-.2.4-.9 1.1-1.1 1.3-.2.2-.4.3-.8.1-.4-.2-1.5-.6-2.9-1.8-1.1-1-1.8-2.1-2-2.5-.2-.4 0-.6.2-.8l.6-.7c.2-.2.3-.4.4-.6.1-.3.1-.5 0-.7-.1-.2-.8-1.9-1.1-2.6-.3-.7-.6-.6-.8-.6h-.7c-.2 0-.6.1-1 .5-.3.4-1.3 1.3-1.3 3.1s1.3 3.6 1.5 3.9c.2.2 2.6 4 6.4 5.5 3.8 1.5 3.8 1 4.5.9.7-.1 2.1-.9 2.4-1.7.3-.8.3-1.5.2-1.7-.1-.1-.3-.2-.7-.4z"/></svg>
+      Simule sem compromisso
+    </div>
+    <div class="el phone" id="s6d">(34) 99689-9148</div>
+    <div class="legal el" id="s6e">Crédito sujeito a análise e às regras do Crédito do Trabalhador.<br>Consulte condições antes de contratar.</div>
+  </section>
+</div>
+
+<script>
+const $ = id => document.getElementById(id);
+const clamp = (x, a = 0, b = 1) => Math.min(b, Math.max(a, x));
+const lerp = (a, b, t) => a + (b - a) * t;
+const easeOutExpo = t => t >= 1 ? 1 : 1 - Math.pow(2, -10 * t);
+const easeInOutCubic = t => t < .5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
+const easeInCubic = t => t * t * t;
+const prog = (t, start, dur) => clamp((t - start) / dur);
+
+// Apple-style blur-rise entrance and blur-lift exit
+function show(id, t, inAt, outAt, o = {}) {
+  const el = typeof id === 'string' ? $(id) : id;
+  const dIn = o.dIn ?? 0.9, dOut = o.dOut ?? 0.6;
+  const rise = o.rise ?? 60, blur = o.blur ?? 18, s0 = o.scale ?? 0.96;
+  const pi = easeOutExpo(prog(t, inAt, dIn));
+  const po = outAt == null ? 0 : easeInCubic(prog(t, outAt, dOut));
+  const op = pi * (1 - po);
+  const y = (1 - pi) * rise - po * (o.riseOut ?? 40);
+  const sc = lerp(s0, 1, pi) * lerp(1, o.scaleOut ?? 1.04, po);
+  const bl = (1 - pi) * blur + po * blur;
+  el.style.opacity = op;
+  el.style.transform = `translateY(${y}px) scale(${sc})`;
+  el.style.filter = bl > 0.05 ? `blur(${bl}px)` : 'none';
+}
+
+const SCENES = [['s1', 0, 4.2], ['s2', 4.2, 9.0], ['s3', 9.0, 14.0], ['s4', 14.0, 20.6], ['s5', 20.6, 25.6], ['s6', 25.6, 32]];
+const DURATION = 32;
+
+function render(t) {
+  for (const [id, a, b] of SCENES) $(id).style.display = (t >= a - 0.01 && t < b + 0.7) ? 'flex' : 'none';
+
+  // drifting ember glows
+  const g = easeInOutCubic(prog(t, 0, DURATION));
+  const gA = $('glowA'), gB = $('glowB');
+  let glowOp = 0.18 + 0.1 * Math.sin(t * 0.8);
+  if (t > 9.0 && t < 14) glowOp += 0.22 * Math.sin(Math.PI * prog(t, 9.0, 5));
+  if (t > 25.6) glowOp = lerp(glowOp, 0.55, easeOutExpo(prog(t, 25.8, 2.5)));
+  gA.style.opacity = glowOp;
+  gB.style.opacity = glowOp * 0.8;
+  gA.style.transform = `translate(${lerp(-500, -100, g) + 60 * Math.sin(t * 0.35)}px, ${lerp(1300, 300, g)}px)`;
+  gB.style.transform = `translate(${lerp(700, 300, g) + 50 * Math.cos(t * 0.4)}px, ${lerp(1500, 600, g)}px)`;
+
+  // watermark bird on middle scenes
+  const m = prog(t, 4.4, 0.8) * (1 - prog(t, 25.0, 0.5));
+  $('mark').style.opacity = 0.55 * m;
+
+  // 1. Hook
+  show('s1a', t, 0.2, 3.6);
+  show('s1b', t, 0.5, 3.6, { rise: 90 });
+  show('s1c', t, 1.7, 3.7);
+
+  // 2. Counter climbing to 10%
+  show('s2a', t, 4.4, 8.4);
+  show('counter', t, 4.9, 8.4, { scale: 0.85, blur: 30 });
+  const n = Math.round(10 * easeOutExpo(prog(t, 5.0, 2.2)) * 10) / 10;
+  $('num').textContent = n >= 10 ? '10' : n.toFixed(1).replace('.', ',');
+  $('counter').style.transform += ` scale(${1 + 0.04 * Math.sin(Math.PI * prog(t, 7.1, 0.5))})`;
+  show('s2b', t, 6.6, 8.4);
+
+  // 3. Reveal
+  show('s3a', t, 9.2, 13.4);
+  show('s3b', t, 10.3, 13.5, { scale: 0.9, blur: 30, rise: 80 });
+  // shimmer on gradient title
+  $('s3b').style.backgroundPosition = `${lerp(0, 100, prog(t, 10.3, 3))}% 0`;
+  show('s3c', t, 11.2, 13.5);
+
+  // 4. Benefits
+  show('s4h', t, 14.2, 20.0);
+  show('c1', t, 14.6, 20.0, { rise: 120 });
+  show('c2', t, 16.0, 20.1, { rise: 120 });
+  show('c3', t, 17.4, 20.2, { rise: 120 });
+
+  // 5. Comparison bars
+  show('s5a', t, 20.8, 25.0);
+  show('bwA', t, 21.3, 25.0, { blur: 0, rise: 0, scale: 1 });
+  show('bwB', t, 21.6, 25.0, { blur: 0, rise: 0, scale: 1 });
+  $('barA').style.transform = `scaleY(${easeOutExpo(prog(t, 21.4, 1.6))})`;
+  $('barB').style.transform = `scaleY(${easeOutExpo(prog(t, 22.0, 1.6))})`;
+  show('s5b', t, 23.0, 25.1);
+  show('s5n', t, 21.6, 25.0, { blur: 0, rise: 0 });
+
+  // 6. Brand: phoenix rises from blur with a slow push-in
+  const birdIn = easeOutExpo(prog(t, 25.8, 1.8));
+  const bird = $('bird');
+  bird.style.opacity = birdIn;
+  bird.style.filter = `blur(${(1 - birdIn) * 40}px) drop-shadow(0 0 ${40 + 30 * birdIn}px rgba(255,140,40,${0.55 * birdIn}))`;
+  bird.style.transform = `translateY(${(1 - birdIn) * 140}px) scale(${lerp(0.7, 1, birdIn) * (1 + 0.025 * prog(t, 27.5, 4.5))})`;
+  show('s6a', t, 26.8, null, { rise: 50 });
+  show('s6b', t, 27.3, null, { rise: 30 });
+  show('s6c', t, 28.2, null, { rise: 60, scale: 0.9 });
+  show('s6d', t, 28.7, null, { rise: 30 });
+  show('s6e', t, 29.2, null, { blur: 0, rise: 0 });
+}
+
+window.DURATION = DURATION;
+window.render = render;
+render(Number(new URLSearchParams(location.search).get('t') || 0));
+</script>
+</body>
+</html>
