@@ -1,0 +1,377 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<style>
+@font-face { font-family: Poppins; font-weight: 400; src: url(Poppins-400.ttf); }
+@font-face { font-family: Poppins; font-weight: 600; src: url(Poppins-600.ttf); }
+@font-face { font-family: Poppins; font-weight: 700; src: url(Poppins-700.ttf); }
+@font-face { font-family: 'DM Serif Display'; font-weight: 400; src: url(DMSerifDisplay-400.ttf); }
+
+/* Themes — see Motion.md */
+body.pastel {
+  --bg: #F8F6F2; --fg: #111111; --soft: #555555; --muted: #8A8A8A; --line: #E2DDD8;
+  --accent: #EDD9D2; --accent-fg: #111111; --card: #FFFFFF;
+  --end-bg: #111111; --end-fg: #FFFFFF; --end-accent: #EDD9D2;
+  --display: 'DM Serif Display', serif; --display-w: 400; --display-ls: -0.02em; --em-style: italic;
+}
+body.tv {
+  --bg: #0B0B0D; --fg: #FFFFFF; --soft: #B5B5BA; --muted: #7C7C82; --line: #26262B;
+  --accent: #E07B39; --accent-fg: #0B0B0D; --card: #17171B;
+  --end-bg: #0B0B0D; --end-fg: #FFFFFF; --end-accent: #E07B39;
+  --display: Poppins, sans-serif; --display-w: 700; --display-ls: -0.045em; --em-style: normal;
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+html, body { width: 1080px; height: 1920px; overflow: hidden; background: var(--bg); }
+#stage { position: relative; width: 1080px; height: 1920px; overflow: hidden; background: var(--bg); color: var(--fg);
+  font-family: Poppins, sans-serif; -webkit-font-smoothing: antialiased; }
+.scene { position: absolute; inset: 0; display: none; }
+.abs { position: absolute; }
+
+.d { font-family: var(--display); font-weight: var(--display-w); letter-spacing: var(--display-ls); line-height: 0.95; }
+.d em { font-style: var(--em-style); color: var(--accent-hi, var(--fg)); }
+body.tv .d em { color: var(--accent); }
+body.pastel .d em { color: var(--soft); }
+.ui { font-weight: 600; letter-spacing: -0.01em; }
+.eyebrow { font-weight: 600; font-size: 30px; letter-spacing: 0.3em; text-transform: uppercase; color: var(--muted); }
+
+/* masked line reveal */
+.ln { overflow: hidden; padding: 0.06em 0 0.1em; margin: -0.06em 0 -0.1em; }
+.ln > span { display: inline-block; will-change: transform; }
+
+.hl { position: relative; display: inline-block; z-index: 0; }
+.hl::before { content: ''; position: absolute; left: -0.12em; right: -0.12em; top: 0.12em; bottom: 0.02em; background: var(--accent); z-index: -1;
+  transform-origin: left; transform: scaleX(var(--hl, 0)); border-radius: 8px; }
+
+
+.pill { display: inline-flex; align-items: center; gap: 14px; padding: 18px 34px; border-radius: 100px; font-weight: 600; font-size: 40px; }
+.pill.solid { background: var(--fg); color: var(--bg); }
+.pill.acc { background: var(--accent); color: var(--accent-fg); }
+.pill.line { border: 3px solid var(--fg); }
+
+#chip { left: 72px; top: 420px; display: flex; align-items: center; gap: 14px; font-weight: 600; font-size: 30px; padding: 14px 26px; border-radius: 100px;
+  background: var(--card); border: 2px solid var(--line); }
+#chip i { width: 16px; height: 16px; border-radius: 50%; background: #E5484D; display: block; }
+
+#wipe { position: absolute; left: 0; right: 0; height: 2200px; top: -140px; background: var(--accent); z-index: 50; transform: translateY(100%); }
+
+/* B: 17% */
+#big17 { left: 40px; top: 560px; font-size: 600px; white-space: nowrap; }
+#big17 .u { font-size: 300px; }
+#strike { left: 30px; top: 830px; width: 1020px; height: 34px; background: var(--fg); transform-origin: left; border-radius: 20px; }
+
+/* C: calendar */
+.cal { display: flex; gap: 18px; }
+.cal .c { width: 205px; height: 190px; border-radius: 32px; border: 3px solid var(--line); background: var(--card); display: flex; flex-direction: column;
+  align-items: center; justify-content: center; }
+.cal .c b { font-family: var(--display); font-weight: var(--display-w); font-size: 76px; letter-spacing: var(--display-ls); line-height: 1; }
+.cal .c small { font-size: 26px; color: var(--muted); margin-top: 6px; font-weight: 600; }
+.cal .c.on { background: var(--accent); border-color: var(--accent); color: var(--accent-fg); }
+.cal .c.on small { color: var(--accent-fg); opacity: 0.7; }
+
+/* D: banks */
+.grid { display: grid; grid-template-columns: repeat(3, 284px); gap: 24px; }
+.bank { height: 170px; border-radius: 34px; background: #fff; border: 2px solid var(--line); display: flex; align-items: center; justify-content: center; overflow: hidden; }
+.bank img { max-width: 80%; max-height: 66%; object-fit: contain; }
+.bank.more { background: var(--fg); color: var(--bg); border: 0; font-family: var(--display); font-weight: var(--display-w); font-size: 72px; letter-spacing: var(--display-ls); }
+#stamp { left: 150px; top: 1250px; transform-origin: center; }
+
+/* E: TV */
+#tvbox { left: 72px; top: 560px; width: 936px; border-radius: 30px; overflow: hidden; border: 14px solid #0d0d0d; box-shadow: 0 40px 80px rgba(0,0,0,0.25); background: #000; }
+#tvbox img { display: block; width: 100%; transform-origin: 70% 40%; }
+#shield { left: 72px; top: 1080px; width: 936px; display: flex; gap: 34px; align-items: center; padding: 44px 48px; border-radius: 44px; background: var(--card); border: 3px solid var(--line); }
+#shield .ic { flex: 0 0 120px; height: 120px; border-radius: 34px; background: var(--accent); display: flex; align-items: center; justify-content: center; }
+#shield svg { width: 66px; height: 66px; fill: none; stroke: var(--accent-fg); stroke-width: 2.3; stroke-linecap: round; stroke-linejoin: round; }
+
+/* F: end */
+#sF { background: var(--end-bg); color: var(--end-fg); }
+#bird { left: 72px; top: 330px; width: 380px; }
+#url { white-space: nowrap; }
+body.pastel #sF .hl::before { background: var(--end-accent); }
+body.pastel #sF .hl { color: #111; }
+</style>
+</head>
+<body>
+<div id="stage">
+
+  <!-- A: hook (visible at frame 0) -->
+  <section class="scene" id="sA">
+    <div class="abs ui" id="chip"><i></i>Como visto na TV · A Tarde é Sua</div>
+    <div class="abs d" id="a1" data-fit="888" style="left:72px; top:560px; font-size:196px; white-space:nowrap">Nome<br><span class="hl" id="a1hl">negativado?</span></div>
+    <div class="abs" style="left:72px; top:1030px; font-size:66px; line-height:1.18; font-weight:600; letter-spacing:-0.02em">
+      <div class="ln"><span id="a2">Com carteira assinada,</span></div>
+      <div class="ln"><span id="a3">você <u style="text-decoration-thickness:6px;text-underline-offset:10px">ainda pode</u> ter crédito.</span></div>
+    </div>
+    <div class="abs" id="a4" style="left:72px; top:1290px"><span class="pill solid">Crédito do Trabalhador · CLT</span></div>
+  </section>
+
+  <!-- B: the expensive alternative -->
+  <section class="scene" id="sB">
+    <div class="abs" style="left:72px; top:260px; font-size:62px; line-height:1.15; font-weight:600; letter-spacing:-0.02em">
+      <div class="ln"><span id="b1">Empréstimo pessoal</span></div>
+      <div class="ln"><span id="b2" style="color:var(--muted)">sem garantia chega a</span></div>
+    </div>
+    <div class="abs d" id="big17"><span id="n17">0</span><span class="u">%</span></div>
+    <div class="abs" id="strike"></div>
+    <div class="abs d" id="b3" style="left:72px; top:1150px; font-size:120px">ao mês.</div>
+    <div class="abs" id="b4" style="left:72px; top:1330px"><span class="pill line">E a 1ª parcela já vence no mês seguinte.</span></div>
+  </section>
+
+  <!-- C: the solution -->
+  <section class="scene" id="sC">
+    <div class="abs eyebrow" id="c0" style="left:72px; top:260px">Crédito do Trabalhador</div>
+    <div class="abs" style="left:72px; top:330px; font-size:84px; line-height:1.08; font-weight:600; letter-spacing:-0.03em">
+      <div class="ln"><span id="c1">Pegue hoje.</span></div>
+      <div class="ln"><span id="c2">Comece a pagar só em</span></div>
+    </div>
+    <div class="abs" id="c3" data-fit="900" style="left:60px; top:560px; display:flex; align-items:flex-end; gap:24px; white-space:nowrap; font-size:100px">
+      <span class="d" style="font-size:1em; padding-bottom:0.62em">até</span>
+      <span class="d" style="font-size:4.4em; line-height:0.82"><span id="n90">0</span></span>
+      <span class="d" id="c3b" style="font-size:1.2em; padding-bottom:0.5em"><em>dias</em></span>
+    </div>
+    <div class="abs cal" id="cal" style="left:72px; top:1130px">
+      <div class="c" id="k0"><b>Hoje</b><small>dinheiro</small></div>
+      <div class="c" id="k1"><b>30</b><small>dias</small></div>
+      <div class="c" id="k2"><b>60</b><small>dias</small></div>
+      <div class="c" id="k3"><b>90</b><small>1ª parcela</small></div>
+    </div>
+    <div class="abs" id="c4" style="left:72px; top:1360px; display:flex; gap:16px"><span class="pill solid">Desconto na folha</span><span class="pill acc">Mesmo negativado</span></div>
+  </section>
+
+  <!-- D: Nix compares 20+ banks -->
+  <section class="scene" id="sD">
+    <div class="abs" style="left:72px; top:260px; font-size:66px; line-height:1.15; font-weight:600; letter-spacing:-0.02em">
+      <div class="ln"><span id="d1">A <span class="hl" id="d1hl">Nix</span>, nossa assistente,</span></div>
+      <div class="ln"><span id="d2" style="color:var(--muted)">compara em segundos</span></div>
+    </div>
+    <div class="abs" id="d3row" data-fit="900" style="left:60px; top:440px; display:flex; align-items:center; gap:34px; white-space:nowrap; font-size:100px">
+      <span class="d" id="d3" style="font-size:3.3em">+<span id="n20">0</span></span>
+      <span class="d" id="d3b" style="font-size:0.92em; line-height:1">bancos<br><em>parceiros</em></span>
+    </div>
+    <div class="abs grid" id="grid" style="left:72px; top:850px">
+      <div class="bank" id="g0"><img src="logos/0_BancoBMG.png" alt="BMG"></div>
+      <div class="bank" id="g1"><img src="logos/2_C6Bank.png" alt="C6 Bank"></div>
+      <div class="bank" id="g2"><img src="logos/3_BancoMercantil.png" alt="Mercantil"></div>
+      <div class="bank" id="g3"><img src="logos/1_Facta.png" alt="Facta" style="max-height:94%"></div>
+      <div class="bank" id="g4"><img src="logos/4_V8Digital.png" alt="V8 Digital" style="max-height:98%"></div>
+      <div class="bank more" id="g5">+15</div>
+    </div>
+    <div class="abs" id="stamp"><span class="pill acc" style="font-size:52px; padding:26px 46px; box-shadow:0 20px 50px rgba(0,0,0,0.25)">✓ A melhor oferta pra você</span></div>
+  </section>
+
+  <!-- E: credibility -->
+  <section class="scene" id="sE">
+    <div class="abs eyebrow" id="e0" style="left:72px; top:260px">Como visto na TV</div>
+    <div class="abs d" id="e1" style="left:72px; top:320px; font-size:104px; line-height:1">A Tarde é Sua<br><em>com Sônia Abrão</em></div>
+    <div class="abs" id="tvbox"><img id="tvimg" src="tv.png" alt="Phoenix Brasil no programa A Tarde é Sua"></div>
+    <div class="abs d" id="e2" data-fit="900" style="left:60px; top:440px; font-size:300px; white-space:nowrap">+<span id="n5k">0</span></div>
+    <div class="abs" id="e2b" style="left:72px; top:770px; font-size:64px; font-weight:600; letter-spacing:-0.02em; line-height:1.15">clientes atendidos<br><span style="color:var(--muted)">no Brasil todo</span></div>
+    <div class="abs" id="shield" style="top:1010px">
+      <div class="ic"><svg viewBox="0 0 24 24"><path d="M12 3l8 3v6c0 4.5-3.4 8.2-8 9-4.6-.8-8-4.5-8-9V6l8-3z"/><path d="M8.5 12l2.5 2.5 4.5-5"/></svg></div>
+      <div><div style="font-size:52px; font-weight:700; line-height:1.1; letter-spacing:-0.02em">Nunca pedimos<br>depósito antecipado.</div>
+        <div style="font-size:34px; color:var(--muted); margin-top:10px">Correspondente bancário autorizado.</div></div>
+    </div>
+  </section>
+
+  <!-- F: brand + CTA -->
+  <section class="scene" id="sF">
+    <img class="abs" id="bird" src="bird_white.png" alt="Phoenix Brasil">
+    <div class="abs" id="f1" data-fit="900" style="white-space:nowrap; left:72px; top:770px; font-family:'DM Serif Display',serif; font-size:118px; letter-spacing:-2px; line-height:1">phoenix brasil</div>
+    <div class="abs" id="f1b" style="left:76px; top:905px; font-size:26px; letter-spacing:0.5em; text-transform:uppercase; color:#8a8a8a; font-weight:600">Soluções Financeiras</div>
+    <div class="abs" style="left:72px; top:1040px; font-size:60px; font-weight:600; letter-spacing:-0.02em; line-height:1.2">
+      <div class="ln"><span id="f2">Simule grátis, a qualquer hora:</span></div>
+    </div>
+    <div class="abs d" id="f3" data-fit="880" style="left:72px; top:1130px; font-size:104px; white-space:nowrap; font-family:Poppins; font-weight:700; letter-spacing:-0.04em"><span class="hl" id="f3hl"><span id="url">phoenixbrasil.com/clt</span></span></div>
+    <div class="abs" id="f4" style="left:72px; top:1290px; font-size:40px; color:#bdbdbd; font-weight:600">● Nix online 24h por dia</div>
+    <div class="abs" id="f5" style="left:72px; top:1400px; width:880px; font-size:28px; line-height:1.4; color:#8a8a8a">Correspondente bancário autorizado · Sujeito à análise de crédito.<br>Carência conforme a instituição. Taxas de mercado variam.</div>
+  </section>
+
+  <div id="wipe"></div>
+</div>
+
+<script>
+const Q = new URLSearchParams(location.search);
+const THEME = Q.get('theme') === 'tv' ? 'tv' : 'pastel';
+document.body.className = THEME;
+if (THEME === 'pastel') document.getElementById('bird').src = 'bird_white.png';
+
+const $ = id => document.getElementById(id);
+const clamp = (x, a = 0, b = 1) => Math.min(b, Math.max(a, x));
+const lerp = (a, b, t) => a + (b - a) * t;
+const easeOutExpo = t => t >= 1 ? 1 : 1 - Math.pow(2, -10 * t);
+const easeOutBack = t => { const c = 1.7; return 1 + (c + 1) * Math.pow(t - 1, 3) + c * Math.pow(t - 1, 2); };
+const easeInCubic = t => t * t * t;
+const easeInOutCubic = t => t < .5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
+const prog = (t, s, d) => clamp((t - s) / d);
+
+// ---- Beat grid: 100 BPM, everything is placed in beats
+const BPM = 100, B = 60 / BPM;
+const at = b => b * B;
+const SCENES = [['sA', 0, 4], ['sB', 4, 12], ['sC', 12, 20], ['sD', 20, 28], ['sE', 28, 36], ['sF', 36, 51]];
+const DURATION = at(51);
+
+// masked line: rises out of its own clip box; leaves upward
+function lineIn(id, t, b0, b1 = null) {
+  const el = $(id);
+  const p = easeOutExpo(prog(t, at(b0), 0.5));
+  const q = b1 == null ? 0 : easeInCubic(prog(t, at(b1), 0.25));
+  el.style.transform = `translateY(${(1 - p) * 115 - q * 115}%)`;
+}
+// punchy scale-in on the beat
+function slam(id, t, b0, o = {}) {
+  const el = $(id);
+  const p = prog(t, at(b0), o.dur ?? 0.32);
+  const s = lerp(o.from ?? 1.35, 1, easeOutBack(p));
+  el.style.opacity = clamp(p * 4);
+  el.style.transform = `${o.base ?? ''} scale(${p <= 0 ? 0 : s}) rotate(${(o.rot ?? 0) * (1 - easeOutExpo(p)) + (o.rotEnd ?? 0)}deg)`;
+}
+// slide from a side
+function slide(id, t, b0, dx = 0, dy = 80, dur = 0.5) {
+  const el = $(id);
+  const p = easeOutExpo(prog(t, at(b0), dur));
+  el.style.opacity = clamp(p * 3);
+  el.style.transform = `translate(${(1 - p) * dx}px, ${(1 - p) * dy}px)`;
+}
+function highlight(id, t, b0) {
+  const k = easeOutExpo(prog(t, at(b0), 0.4));
+  $(id).style.setProperty('--hl', k);
+  if (THEME === 'tv') $(id).style.color = k > 0.5 ? 'var(--accent-fg)' : 'var(--fg)';
+}
+const ctr = (t, b0, beats, max) => Math.round(max * easeOutExpo(prog(t, at(b0), at(beats))));
+
+const COUNTERS = [
+  { id: 'n17', b0: 5, beats: 3, max: 17 },
+  { id: 'n90', b0: 13.5, beats: 3, max: 90 },
+  { id: 'n20', b0: 21, beats: 2.5, max: 20 },
+  { id: 'n5k', b0: 31, beats: 3, max: 5000 },
+];
+
+let fitted = false;
+function fitAll() {
+  for (const el of document.querySelectorAll('[data-fit]')) {
+    const max = +el.dataset.fit;
+    let fs = parseFloat(getComputedStyle(el).fontSize);
+    const shown = el.closest('.scene'), prev = shown.style.display;
+    shown.style.display = 'block';
+    el.style.transform = 'none';
+    while (el.scrollWidth > max && fs > 20) { fs -= 2; el.style.fontSize = fs + 'px'; }
+    shown.style.display = prev;
+  }
+  fitted = true;
+}
+
+function render(t) {
+  const beat = t / B;
+  for (const [id, a, b] of SCENES) $(id).style.display = (beat >= a && beat < b) ? 'block' : 'none';
+
+  // wipe across the cut into the solution (b12) and into the end card (b36)
+  const wipe = $('wipe');
+  let wy = 100;
+  for (const cut of [12, 36]) {
+    const w = (t - at(cut) + 0.24) / 0.48;
+    if (w > 0 && w < 1) wy = lerp(100, -100, easeInOutCubic(w));
+  }
+  wipe.style.transform = `translateY(${wy}%)`;
+  wipe.style.background = beat > 30 ? 'var(--end-accent)' : 'var(--accent)';
+
+  // A — hook, already on screen at t=0; settles in the first beat
+  const s0 = 1;
+  $('a1').style.transform = `scale(${s0})`; $('a1').style.transformOrigin = 'left top';
+  highlight('a1hl', t, 0.6);
+  lineIn('a2', t, 1.5); lineIn('a3', t, 2.2);
+  slide('a4', t, 3, -60, 0, 0.35);
+  $('chip').style.opacity = 1;
+  $('chip').querySelector('i').style.opacity = 0.35 + 0.65 * (Math.floor(t * 2.5) % 2);
+
+  // B — 17% climbs, gets struck through
+  lineIn('b1', t, 4); lineIn('b2', t, 4.5);
+  slam('big17', t, 5, { from: 0.6, dur: 0.45 });
+  $('n17').textContent = ctr(t, 5, 3, 17);
+  slam('b3', t, 7.5, { from: 1.4 });
+  slide('b4', t, 9, 0, 60);
+  const sk = easeOutExpo(prog(t, at(10.5), 0.3));
+  $('strike').style.transform = `scaleX(${sk})`;
+  $('strike').style.opacity = sk > 0 ? 1 : 0;
+
+  // C — 90 days, calendar steps on the beat
+  slide('c0', t, 12.4, -40, 0, 0.4);
+  lineIn('c1', t, 12.5); lineIn('c2', t, 13);
+  slam('c3', t, 13.5, { from: 0.7, dur: 0.4 });
+  $('n90').textContent = ctr(t, 13.5, 3, 90);
+  slam('c3b', t, 15, { from: 1.4 });
+  for (let i = 0; i < 4; i++) {
+    slide('k' + i, t, 15.5 + i * 0.5, 0, 60, 0.35);
+    $('k' + i).classList.toggle('on', i === 3 ? beat >= 17.5 : beat >= 15.5 + i * 0.5 && beat < 17.5);
+  }
+  $('k3').style.transform += ` scale(${1 + 0.08 * Math.sin(Math.PI * prog(t, at(17.5), 0.35))})`;
+  slide('c4', t, 18.5, 0, 60);
+
+  // D — Nix + 20 banks; logos land on half-beats; stamp slams
+  lineIn('d1', t, 20); lineIn('d2', t, 20.5);
+  highlight('d1hl', t, 20.6);
+  slam('d3', t, 21, { from: 0.6, dur: 0.45 });
+  $('n20').textContent = ctr(t, 21, 2.5, 20);
+  slide('d3b', t, 21.5, 60, 0, 0.4);
+  for (let i = 0; i < 6; i++) slam('g' + i, t, 22.5 + i * 0.5, { from: 0.4, dur: 0.3 });
+  slam('stamp', t, 26, { from: 2.2, rot: -14, rotEnd: -4, dur: 0.3 });
+
+  // E — TV authority → +5.000 → never asks upfront money
+  const tvOn = beat < 31;
+  for (const id of ['e0', 'e1', 'tvbox']) $(id).style.display = tvOn ? 'block' : 'none';
+  for (const id of ['e2', 'e2b']) $(id).style.display = tvOn ? 'none' : 'block';
+  slide('e0', t, 28, -40, 0, 0.35);
+  slam('e1', t, 28.25, { from: 1.15, dur: 0.35 });
+  slide('tvbox', t, 28.75, 0, 160, 0.6);
+  $('tvimg').style.transform = `scale(${1 + 0.07 * prog(t, at(28.75), at(2.25))})`;
+  slam('e2', t, 31, { from: 0.6, dur: 0.45 });
+  $('n5k').textContent = ctr(t, 31, 3, 5000).toLocaleString('pt-BR');
+  slide('e2b', t, 31.5, -60, 0, 0.4);
+  slide('shield', t, 33, 0, 140, 0.5);
+
+  // F — end card
+  const bi = prog(t, at(36), 0.5);
+  $('bird').style.opacity = clamp(bi * 3);
+  $('bird').style.transform = `translateY(${(1 - easeOutExpo(bi)) * 140}px) scale(${lerp(0.7, 1, easeOutBack(bi))})`;
+  slide('f1', t, 37, -60, 0, 0.45);
+  slide('f1b', t, 37.5, -40, 0, 0.4);
+  lineIn('f2', t, 38.5);
+  slam('f3', t, 39.5, { from: 1.25, dur: 0.35 });
+  highlight('f3hl', t, 40);
+  slide('f4', t, 41.5, 0, 40, 0.4);
+  slide('f5', t, 42.5, 0, 0, 0.6);
+}
+
+// sound cues on the beat grid (consumed by sfx/music mixer)
+function cues() {
+  const c = [], add = (b, type, gain = 1) => c.push({ t: +at(b).toFixed(3), type, gain });
+  add(0, 'hit'); add(0.6, 'swipe', 0.5);
+  add(1.5, 'tick2'); add(2.2, 'tick2'); add(3, 'pop');
+  add(4, 'hit'); add(4, 'whoosh', 0.7);
+  add(7.5, 'hit', 0.8); add(9, 'pop'); add(10.5, 'slash');
+  add(11.76, 'whoosh'); add(12, 'hit');
+  add(15, 'hit', 0.7);
+  for (let i = 0; i < 4; i++) add(15.5 + i * 0.5, 'pop', 0.6 + i * 0.1);
+  add(17.5, 'ding', 0.8); add(18.5, 'pop');
+  add(20, 'hit'); add(20.6, 'swipe', 0.5);
+  for (let i = 0; i < 6; i++) add(22.5 + i * 0.5, 'pop', 0.7);
+  add(26, 'stamp');
+  add(28, 'hit'); add(28.75, 'whoosh', 0.7); add(29.4, 'shimmer');
+  add(31, 'hit'); add(33, 'whoosh', 0.6); add(33.4, 'ding', 0.7);
+  add(35.5, 'riser'); add(36, 'boom'); add(36, 'whoosh');
+  add(37, 'pop', 0.5); add(39.5, 'hit', 0.8); add(40, 'swipe', 0.5);
+  for (const k of COUNTERS) {
+    let last = -1, lastT = -1;
+    for (let f = Math.floor(at(k.b0) * 60); f <= at(k.b0 + k.beats) * 60; f++) {
+      const tt = f / 60, v = Math.round(k.max * easeOutExpo(prog(tt, at(k.b0), at(k.beats))));
+      if (v !== last && tt - lastT >= 0.05) { c.push({ t: +tt.toFixed(3), type: 'tick', gain: 0.55 }); last = v; lastT = tt; }
+    }
+  }
+  return c.sort((a, b) => a.t - b.t);
+}
+
+window.fitAll = fitAll; window.BPM = BPM; window.DURATION = DURATION; window.render = render; window.cues = cues;
+render(Number(Q.get('t') || 0));
+</script>
+</body>
+</html>
